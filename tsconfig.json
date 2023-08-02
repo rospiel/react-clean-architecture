@@ -16,7 +16,6 @@
       "@/*": ["*"]
     },
     "allowJs": true,
-    "strict": false,
     "resolveJsonModule": true
   },
   "include": [
