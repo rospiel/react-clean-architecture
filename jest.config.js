@@ -12,5 +12,10 @@ module.exports = {
   moduleNameMapper: {
     '@/(.*)': '<rootDir>/src/$1',
     '\\.scss$': 'identity-obj-proxy'
+  },
+  globals: {
+    'ts-jest': {
+      diagnostics: false
+    }
   }
 }
