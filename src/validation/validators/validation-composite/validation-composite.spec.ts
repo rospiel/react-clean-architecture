@@ -1,4 +1,4 @@
-import { FieldValidationSpy } from '../test/mock-field-validation'
+import { FieldValidationSpy } from '@/validation/test'
 import { ValidationComposite } from './validation-composite'
 import faker from 'faker'
 
@@ -13,7 +13,7 @@ function makeSut (fieldName: string): SutTypes {
     new FieldValidationSpy(fieldName)
   ]
 
-  const sut = new ValidationComposite(fieldValidationSpy)
+  const sut = ValidationComposite.build(fieldValidationSpy)
   return { sut, listFieldValidationSpy: fieldValidationSpy }
 }
 
