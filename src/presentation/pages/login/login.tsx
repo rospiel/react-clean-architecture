@@ -4,7 +4,7 @@ import Styles from './login-styles.scss'
 import { LoginHeader, Footer, Input, FormStatus } from '@/presentation/components'
 import Context from '@/presentation/contexts/form/form-context'
 import { Validation } from '@/presentation/protocols/validation'
-import { Authentication } from '@/domain/usecases'
+import { Authentication, SaveAccessToken } from '@/domain/usecases'
 import { Link, useHistory } from 'react-router-dom'
 
 type StateProps = {
@@ -19,6 +19,7 @@ type StateProps = {
 type LoginProps = {
   validation: Validation
   authentication: Authentication
+  saveAccessToken: SaveAccessToken
 }
 
 export default function Login (props: LoginProps): JSX.Element {
@@ -67,7 +68,7 @@ export default function Login (props: LoginProps): JSX.Element {
         password: state.password
       })
 
-      localStorage.setItem('accessToken', response.accessToken)
+      await props.saveAccessToken.save(response.accessToken)
       history.replace('/')
     } catch (error) {
       setState({
