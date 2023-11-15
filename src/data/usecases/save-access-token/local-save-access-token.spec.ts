@@ -1,4 +1,4 @@
-import { SetStorageMock } from '@/data/test/mock-storage'
+import { SetStorageMock } from '@/data/test/mock-cache'
 import { LocalSaveAccessToken } from './local-save-access-token'
 import faker from 'faker'
 
@@ -26,10 +26,10 @@ describe('LocalSaveAccessToken', () => {
 
   test('Should throw when SetStorage throws', async () => {
     const { sut, setStorageMock } = makeSut()
-    const error = new Error();
+    const error = new Error()
     jest.spyOn(setStorageMock, 'set').mockRejectedValueOnce(error)
     const accessToken = faker.random.uuid()
     const result = sut.save(accessToken)
-    expect(result).rejects.toThrow(error)
+    await expect(result).rejects.toThrow(error)
   })
 })

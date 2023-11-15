@@ -38,10 +38,12 @@ export default function Login (props: LoginProps): JSX.Element {
   const [state, setState] = useState<StateProps>(initialStateProps())
 
   useEffect(() => {
+    const formData = { email: state.email, password: state.password }
+
     setState({
       ...state,
-      emailError: props.validation.validate('email', state.email),
-      passwordError: props.validation.validate('password', state.password)
+      emailError: props.validation.validate('email', formData),
+      passwordError: props.validation.validate('password', formData)
 
     })
   }, [state.email, state.password])
@@ -89,7 +91,7 @@ export default function Login (props: LoginProps): JSX.Element {
 
           <Input type="password" name="password" placeholder='Digite sua senha' />
 
-          <button data-testid="submit" disabled={hasError()} className={Styles.submit}>Entrar</button>
+          <button type="submit" data-testid="submit" disabled={hasError()} className={Styles.submit}>Entrar</button>
           <Link data-testid="signup" to="/signup" className={Styles.link}>Criar conta</Link>
           <FormStatus />
         </form>

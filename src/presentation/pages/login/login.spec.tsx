@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, RenderResult, fireEvent, cleanup, waitFor } from '@testing-library/react'
 import { Login } from '@/presentation/pages'
-import { AuthenticationSpy, ValidationStub, SaveAccessTokenMock } from '@/presentation/test'
+import { AuthenticationSpy, ValidationStub, SaveAccessTokenMock, Helper } from '@/presentation/test'
 import faker from 'faker'
 import { InvalidCredentialsError } from '@/domain/errors'
 import { Router } from 'react-router'
@@ -32,45 +32,14 @@ function makeSut (errorMessage?: string): SutTypes {
   }
 }
 
-function populateInput (sut: RenderResult, inputName: string, value: string): void {
-  const input = sut.getByTestId(inputName)
-  fireEvent.input(input, { target: { value: value } })
-}
-
 async function simulateSubmit (sut: RenderResult, email = faker.internet.email(), password = faker.internet.password()): Promise<void> {
-  populateInput(sut, 'email', email)
-  populateInput(sut, 'password', password)
+  Helper.populateInput(sut, 'email', email)
+  Helper.populateInput(sut, 'password', password)
 
   const form = sut.getByTestId('form')
   fireEvent.submit(form)
   /* because the call is async wait until finish, necessary pass a element that is always in the screen to listening  */
   await waitFor(() => form)
-}
-
-function testStatusForField (sut: RenderResult, fieldName: string, errorMessage?: string): void {
-  const emailStatus = sut.getByTestId(fieldName.concat('-status'))
-  expect(emailStatus.title).toBe(errorMessage || 'Tudo certo')
-  expect(emailStatus.textContent).toBe(errorMessage ? '🔴' : '🟢')
-}
-
-function testContainerChildCount (sut: RenderResult, count: number, containerName: string): void {
-  const container = sut.getByTestId(containerName)
-  expect(container.childElementCount).toBe(count)
-}
-
-function testElementExists (sut: RenderResult, fieldName: string): void {
-  const element = sut.getByTestId(fieldName)
-  expect(element).toBeTruthy()
-}
-
-function testElementText (sut: RenderResult, fieldName: string, text: string): void {
-  const element = sut.getByTestId(fieldName)
-  expect(element.textContent).toBe(text)
-}
-
-function testButtonIsDisabled (sut: RenderResult, fieldName: string, isDisabled: boolean): void {
-  const button = sut.getByTestId(fieldName) as HTMLButtonElement
-  expect(button.disabled).toBe(isDisabled)
 }
 
 describe('Login component', () => {
@@ -85,45 +54,45 @@ describe('Login component', () => {
     const submitButton = sut.getByTestId('submit') as HTMLButtonElement
     expect(submitButton.disabled).toBe(true)
 
-    testContainerChildCount(sut, 0, 'error-container')
-    testButtonIsDisabled(sut, 'submit', true)
-    testStatusForField(sut, 'email', errorMessage)
-    testStatusForField(sut, 'password', errorMessage)
+    Helper.testContainerChildCount(sut, 0, 'error-container')
+    Helper.testButtonIsDisabled(sut, 'submit', true)
+    Helper.testStatusForField(sut, 'email', errorMessage)
+    Helper.testStatusForField(sut, 'password', errorMessage)
   })
 
   test('Should show error message when email validation fails', () => {
     const errorMessage = faker.random.words()
     const { sut } = makeSut(errorMessage)
-    populateInput(sut, 'email', faker.internet.email())
-    testStatusForField(sut, 'email', errorMessage)
+    Helper.populateInput(sut, 'email', faker.internet.email())
+    Helper.testStatusForField(sut, 'email', errorMessage)
   })
 
   test('Should show error message when password validation fails', () => {
     const errorMessage = faker.random.words()
     const { sut } = makeSut(errorMessage)
-    populateInput(sut, 'password', faker.internet.password())
-    testStatusForField(sut, 'password', errorMessage)
+    Helper.populateInput(sut, 'password', faker.internet.password())
+    Helper.testStatusForField(sut, 'password', errorMessage)
   })
 
   test('Should show valid password when validation succeeds', () => {
     const { sut } = makeSut()
-    populateInput(sut, 'password', faker.internet.password())
-    testStatusForField(sut, 'password')
+    Helper.populateInput(sut, 'password', faker.internet.password())
+    Helper.testStatusForField(sut, 'password')
   })
 
   test('Should show valid email when validation succeeds', () => {
     const { sut } = makeSut()
-    populateInput(sut, 'email', faker.internet.email())
-    testStatusForField(sut, 'password')
+    Helper.populateInput(sut, 'email', faker.internet.email())
+    Helper.testStatusForField(sut, 'password')
   })
 
   test('Should enable submit button when without errors', () => {
     const { sut } = makeSut()
 
-    populateInput(sut, 'email', faker.internet.email())
-    populateInput(sut, 'password', faker.internet.password())
+    Helper.populateInput(sut, 'email', faker.internet.email())
+    Helper.populateInput(sut, 'password', faker.internet.password())
 
-    testButtonIsDisabled(sut, 'submit', false)
+    Helper.testButtonIsDisabled(sut, 'submit', false)
   })
 
   test('Should show spinner when form submit', async () => {
@@ -131,7 +100,7 @@ describe('Login component', () => {
 
     await simulateSubmit(sut, faker.internet.email(), faker.internet.password())
 
-    testElementExists(sut, 'spinner')
+    Helper.testElementExists(sut, 'spinner')
   })
 
   test('Should call Authentication Service with correct values', async () => {
@@ -171,18 +140,18 @@ describe('Login component', () => {
 
     await simulateSubmit(sut)
 
-    testElementText(sut, 'error-message', error.message)
+    Helper.testElementText(sut, 'error-message', error.message)
     /* confirm that the loading is hidden */
-    testContainerChildCount(sut, 1, 'error-container')
+    Helper.testContainerChildCount(sut, 1, 'error-container')
   })
 
   test('Should show error when call SaveAccessToken and throw exception', async () => {
-    const { sut, authenticationSpy, saveAccessTokenMock } = makeSut()
+    const { sut, saveAccessTokenMock } = makeSut()
     const error = new InvalidCredentialsError()
     jest.spyOn(saveAccessTokenMock, 'save').mockReturnValueOnce(Promise.reject(error))
     await simulateSubmit(sut)
-    testElementText(sut, 'error-container', error.message)
-    testContainerChildCount(sut, 1, 'error-container')
+    Helper.testElementText(sut, 'error-container', error.message)
+    Helper.testContainerChildCount(sut, 1, 'error-container')
   })
 
   test('Should call SaveAccessToken on success', async () => {

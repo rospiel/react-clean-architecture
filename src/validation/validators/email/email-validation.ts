@@ -6,8 +6,8 @@ export class EmailValidation implements FieldValidation {
 
   constructor (readonly field: string) { }
 
-  validate (value: string): Error {
-    return (this.isEmpty(value) || this.EMAIL_REGEX.test(value)) ? null : new InvalidFieldError()
+  validate (input: object): Error {
+    return (this.isEmpty(input[this.field]) || this.EMAIL_REGEX.test(input[this.field])) ? null : new InvalidFieldError()
   }
 
   isEmpty (value: string): boolean {
