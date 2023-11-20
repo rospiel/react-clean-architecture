@@ -9,12 +9,14 @@
     "test:staged": "npm test -- --findRelatedTests",
     "test:ci": "npm test -- --coverage",
     "start": "webpack-dev-server --open",
-    "check": "npm-check -u -s"
+    "check": "npm-check -u -s",
+    "test:cypress": "cypress open"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@cypress/webpack-preprocessor": "5.4.1",
     "@testing-library/jest-dom": "6.1.4",
     "@testing-library/react": "12.1.2",
     "@types/axios": "0.14.0",
@@ -30,8 +32,10 @@
     "@typescript-eslint/eslint-plugin": "2.33.0",
     "clean-webpack-plugin": "3.0.0",
     "css-loader": "3.5.3",
+    "cypress": "4.6.0",
     "eslint": "7.0.0",
     "eslint-config-standard-with-typescript": "16.0.0",
+    "eslint-plugin-cypress": "2.10.3",
     "eslint-plugin-import": "2.20.2",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "4.2.1",
