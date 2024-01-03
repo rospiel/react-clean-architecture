@@ -1,7 +1,8 @@
 import faker from 'faker'
 import react from 'react'
+import * as formHelp from '../support/form-helper'
+import { mockResponse } from '../support/http-mocks'
 
-const BASE_URL: string = Cypress.config().baseUrl
 const EMAIL_ELEMENT = 'email'
 const EMAIL_STATUS_ELEMENT = 'email-status'
 const PASSWORD_ELEMENT = 'password'
@@ -18,17 +19,13 @@ describe('Login', function () {
     cy.getByTestId(EMAIL_ELEMENT)
       .should('have.attr', 'readOnly')
 
-    cy.getByTestId(EMAIL_STATUS_ELEMENT)
-      .should('have.attr', 'title', 'Campo obrigatório')
-      .should('contain.text', '🔴')
+    formHelp.testInputStatus(EMAIL_STATUS_ELEMENT, 'Campo obrigatório', '🔴')
 
     cy.getByTestId(PASSWORD_ELEMENT)
       .should('have.attr', 'readOnly')
 
-    cy.getByTestId(PASSWORD_STATUS_ELEMENT)
-      .should('have.attr', 'title', 'Campo obrigatório')
-      .should('contain.text', '🔴')
-
+    formHelp.testInputStatus(PASSWORD_STATUS_ELEMENT, 'Campo obrigatório', '🔴')      
+    
     cy.getByTestId(SUBMIT_ELEMENT)
       .should('have.attr', 'disabled')
 
@@ -37,39 +34,23 @@ describe('Login', function () {
   })
 
   it('Should show error when form is invalid', function () {
-    cy.getByTestId(EMAIL_ELEMENT)
-      .focus()
-      .type(faker.random.alphaNumeric(3))
-
-    cy.getByTestId(EMAIL_STATUS_ELEMENT)
-      .should('have.attr', 'title', 'Valor inválido')
-      .should('contain.text', '🔴')
-
-    cy.getByTestId(PASSWORD_ELEMENT)
-      .focus()
-      .type(faker.random.alphaNumeric(3))
-
-    cy.getByTestId(PASSWORD_STATUS_ELEMENT)
-      .should('have.attr', 'title', 'Valor inválido')
-      .should('contain.text', '🔴')
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.random.alphaNumeric(3))
+    
+    formHelp.testInputStatus(EMAIL_STATUS_ELEMENT, 'Valor inválido', '🔴')
+      
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(3))
+    
+    formHelp.testInputStatus(PASSWORD_STATUS_ELEMENT, 'Valor inválido', '🔴')
   })
 
   it('Should allow submit when form is valid', function () {
-    cy.getByTestId(EMAIL_ELEMENT)
-      .focus()
-      .type(faker.internet.email())
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
+    
+    formHelp.testInputStatus(EMAIL_STATUS_ELEMENT, 'Tudo certo', '🟢')
 
-    cy.getByTestId(EMAIL_STATUS_ELEMENT)
-      .should('have.attr', 'title', 'Tudo certo')
-      .should('contain.text', '🟢')
-
-    cy.getByTestId(PASSWORD_ELEMENT)
-      .focus()
-      .type(faker.random.alphaNumeric(5))
-
-    cy.getByTestId(PASSWORD_STATUS_ELEMENT)
-      .should('have.attr', 'title', 'Tudo certo')
-      .should('contain.text', '🟢')
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    
+    formHelp.testInputStatus(PASSWORD_STATUS_ELEMENT, 'Tudo certo', '🟢')
 
     cy.getByTestId(SUBMIT_ELEMENT)
       .should('not.have.attr', 'disabled')
@@ -79,50 +60,87 @@ describe('Login', function () {
   })
 
   it('Should show error when credentials failed', function () {
-    cy.getByTestId(EMAIL_ELEMENT)
-      .focus()
-      .type(faker.internet.email())
-
-    cy.getByTestId(PASSWORD_ELEMENT)
-      .focus()
-      .type(faker.random.alphaNumeric(5))
-
+    mockResponse('POST', /login/, 401, { error: faker.random.words() })
+    
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
+    
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    
     cy.getByTestId(SUBMIT_ELEMENT).click()
 
-    cy.getByTestId(ERROR_ELEMENT)
-      .getByTestId('spinner')
-      .should('exist')
-      .getByTestId('error-message')
-      .should('not.exist')
-      .getByTestId('spinner')
-      .should('not.exist')
-      .getByTestId('error-message')
-      .should('contain.text', 'Credenciais inválidas')
-
-    cy.url().should('eq', `${BASE_URL}/login`)
+    formHelp.testContainerError('Credenciais inválidas')
+    
+    formHelp.testUrl('/login')
   })
 
   it('Should save access token on local storage when credentials succeed ', function () {
-    cy.getByTestId(EMAIL_ELEMENT)
-      .focus()
-      .type('t@t.com')
+    mockResponse('POST', /login/, 200, { accessToken: faker.random.uuid() })
+    
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
 
-    cy.getByTestId(PASSWORD_ELEMENT)
-      .focus()
-      .type('123456')
-
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    
     cy.getByTestId(SUBMIT_ELEMENT).click()
 
     cy.getByTestId(ERROR_ELEMENT)
-      .getByTestId('spinner')
-      .should('exist')
-      .getByTestId('error-message')
       .should('not.exist')
-      .getByTestId('spinner')
-      .should('not.exist')
+      
+    formHelp.testUrl('/')
 
-    cy.url().should('eq', `${BASE_URL}/`)
+    formHelp.checkItemLocalStorage('accessToken')
+  })
 
-    cy.window().then(window => assert.isOk(window.localStorage.getItem('accessToken')))
+  it('Should present UnexpectedError on default error', function () {
+    mockResponse('POST', /login/, faker.helpers.randomize([400, 404, 500]), { error: faker.random.uuid() })
+
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
+    
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    
+    cy.getByTestId(SUBMIT_ELEMENT).click()
+
+    formHelp.testContainerError('Instabilidade no sistema. Tente novamente em breve.')
+    
+    formHelp.testUrl('/login')
+  })
+
+  it('Should present UnexpectedError when invalid data is returned', function () {
+    const invalidProperty: string = faker.random.words()
+    mockResponse('POST', /login/, 200, { invalidProperty: faker.random.uuid() })
+    
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
+    
+    formHelp.submitFormByEnter(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    
+    formHelp.testContainerError('Instabilidade no sistema. Tente novamente em breve.')
+    
+    formHelp.testUrl('/login')
+  })
+
+  it('Should not allowed multiple submits', function () {
+    mockResponse('POST', /login/, 200, { accessToken: faker.random.uuid() })
+      .as('request')
+    /* give a name to count requests */
+    
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
+    
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    
+    /* simulate double click */
+    cy.getByTestId(SUBMIT_ELEMENT).dblclick()
+
+    /* verify if just call one time */
+    cy.get('@request.all').should('have.length', 1)
+  })
+
+  it('Should not call external service when form is invalid', function () {
+    mockResponse('POST', /login/, 200, { accessToken: faker.random.uuid() })
+      .as('request')
+    /* give a name to count requests */
+    
+    formHelp.submitFormByEnter(EMAIL_ELEMENT, faker.random.alphaNumeric(5))
+    
+    /* verify if just call one time */
+    cy.get('@request.all').should('have.length', 0)
   })
 })
