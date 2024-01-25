@@ -5,7 +5,7 @@ import { LoginHeader, Footer, Input, FormStatus } from '@/presentation/component
 import Context from '@/presentation/contexts/form/form-context'
 import { Link, useHistory } from 'react-router-dom'
 import { Validation } from '@/presentation/protocols/validation'
-import { AddAccount, SaveAccessToken } from '@/domain/usecases'
+import { AddAccount, UpdateCurrentAccount } from '@/domain/usecases'
 
 type StateProps = {
   name: string
@@ -23,7 +23,7 @@ type StateProps = {
 type SignUpProps = {
   validation: Validation
   addAccount: AddAccount
-  saveAccessToken: SaveAccessToken
+  updateCurrentAccount: UpdateCurrentAccount
 }
 
 export default function SignUp (props: SignUpProps): JSX.Element {
@@ -81,7 +81,7 @@ export default function SignUp (props: SignUpProps): JSX.Element {
         passwordConfirmation: state.passwordConfirmation
       })
 
-      await props.saveAccessToken.save(account.accessToken)
+      await props.updateCurrentAccount.save(account)
       history.replace('/')
     } catch (error) {
       setState({

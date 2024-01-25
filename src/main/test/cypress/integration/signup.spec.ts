@@ -33,6 +33,10 @@ function buildCompletedValidForm (): void {
   formHelp.testInputStatusSuccess(PASSWORD_CONFIRMATION_STATUS_ELEMENT)
 }
 
+function buildResponse (): object {
+  return { accessToken: faker.random.uuid(), name: faker.name.findName() }
+}
+
 describe('SignUp', function () {
   this.beforeEach(function () {
     cy.visit('signup')
@@ -106,8 +110,8 @@ describe('SignUp', function () {
     formHelp.testUrl('/signup')
   })
 
-  it('Should save access token on local storage when credentials succeed ', function () {
-    mockResponse('POST', /signup/, 200, { accessToken: faker.random.uuid() })
+  it('Should save account on local storage when credentials succeed ', function () {
+    mockResponse('POST', /signup/, 200, buildResponse())
     
     buildCompletedValidForm()
     
@@ -118,7 +122,7 @@ describe('SignUp', function () {
       
     formHelp.testUrl('/')
 
-    formHelp.checkItemLocalStorage('accessToken')
+    formHelp.checkItemLocalStorage('account')
   })
 
   it('Should present UnexpectedError on default error', function () {
@@ -147,7 +151,7 @@ describe('SignUp', function () {
   })
 
   it('Should not allowed multiple submits', function () {
-    mockResponse('POST', /signup/, 200, { accessToken: faker.random.uuid() })
+    mockResponse('POST', /signup/, 200, buildResponse())
       .as('request')
     /* give a name to count requests */
     
@@ -161,7 +165,7 @@ describe('SignUp', function () {
   })
 
   it('Should not call external service when form is invalid', function () {
-    mockResponse('POST', /signup/, 200, { accessToken: faker.random.uuid() })
+    mockResponse('POST', /signup/, 200, { account: faker.random.uuid() })
       .as('request')
     /* give a name to count requests */
     

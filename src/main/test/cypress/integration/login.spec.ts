@@ -10,6 +10,10 @@ const PASSWORD_STATUS_ELEMENT = 'password-status'
 const SUBMIT_ELEMENT = 'submit'
 const ERROR_ELEMENT = 'error-container'
 
+function buildResponse (): object {
+  return { accessToken: faker.random.uuid(), name: faker.name.findName() }
+}
+
 describe('Login', function () {
   this.beforeEach(function () {
     cy.visit('login')
@@ -73,8 +77,8 @@ describe('Login', function () {
     formHelp.testUrl('/login')
   })
 
-  it('Should save access token on local storage when credentials succeed ', function () {
-    mockResponse('POST', /login/, 200, { accessToken: faker.random.uuid() })
+  it('Should save account on local storage when credentials succeed ', function () {
+    mockResponse('POST', /login/, 200, buildResponse())
     
     formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
 
@@ -87,7 +91,7 @@ describe('Login', function () {
       
     formHelp.testUrl('/')
 
-    formHelp.checkItemLocalStorage('accessToken')
+    formHelp.checkItemLocalStorage('account')
   })
 
   it('Should present UnexpectedError on default error', function () {
@@ -118,7 +122,7 @@ describe('Login', function () {
   })
 
   it('Should not allowed multiple submits', function () {
-    mockResponse('POST', /login/, 200, { accessToken: faker.random.uuid() })
+    mockResponse('POST', /login/, 200, buildResponse())
       .as('request')
     /* give a name to count requests */
     
@@ -134,7 +138,7 @@ describe('Login', function () {
   })
 
   it('Should not call external service when form is invalid', function () {
-    mockResponse('POST', /login/, 200, { accessToken: faker.random.uuid() })
+    mockResponse('POST', /login/, 200, buildResponse())
       .as('request')
     /* give a name to count requests */
     
