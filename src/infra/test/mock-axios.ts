@@ -1,3 +1,4 @@
+import { mockGetRequest } from '@/data/test'
 import Axios from 'axios'
 import faker from 'faker'
 
@@ -8,6 +9,7 @@ export const mockHttpResponse = (): any => ({
 
 export const mockAxios = (): jest.Mocked<typeof Axios> => {
   const mockedAxios = Axios as jest.Mocked<typeof Axios>
-  mockedAxios.post.mockResolvedValue(mockHttpResponse())
+  mockedAxios.post.mockClear().mockResolvedValue(mockHttpResponse())
+  mockedAxios.get.mockClear().mockResolvedValue(mockHttpResponse())
   return mockedAxios
 }
