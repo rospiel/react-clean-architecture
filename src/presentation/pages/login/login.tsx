@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Styles from './login-styles.scss'
 
 import { LoginHeader, Footer, Input, FormStatus } from '@/presentation/components'
 import Context from '@/presentation/contexts/form/form-context'
 import { Validation } from '@/presentation/protocols/validation'
-import { Authentication, UpdateCurrentAccount } from '@/domain/usecases'
+import { Authentication } from '@/domain/usecases'
 import { Link, useHistory } from 'react-router-dom'
+import apiContext from '@/presentation/contexts/api/api-context'
 
 type StateProps = {
   email: string
@@ -19,7 +20,6 @@ type StateProps = {
 type LoginProps = {
   validation: Validation
   authentication: Authentication
-  updateCurrentAccount: UpdateCurrentAccount
 }
 
 export default function Login (props: LoginProps): JSX.Element {
@@ -34,6 +34,7 @@ export default function Login (props: LoginProps): JSX.Element {
     }
   }
 
+  const { setCurrentAccount } = useContext(apiContext)
   const history = useHistory()
   const [state, setState] = useState<StateProps>(initialStateProps())
 
@@ -70,7 +71,7 @@ export default function Login (props: LoginProps): JSX.Element {
         password: state.password
       })
 
-      await props.updateCurrentAccount.save(response)
+      setCurrentAccount(response)
       history.replace('/')
     } catch (error) {
       setState({
