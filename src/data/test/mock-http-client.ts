@@ -8,11 +8,12 @@ export const mockPostRequest = (): HttpPostClientParams => ({
 
 export function mockGetRequest (): HttpGetParams {
   return {
-    url: faker.internet.url()
+    url: faker.internet.url(),
+    headers: faker.random.objectElement()
   }
 } 
 
-export class HttpPostClientSpy<R> implements HttpPostClient<R> {
+export class HttpPostClientSpy<R = any> implements HttpPostClient<R> {
   url?: string
   body?: any
   response: HttpResponse<R> = {
@@ -26,14 +27,16 @@ export class HttpPostClientSpy<R> implements HttpPostClient<R> {
   }
 }
 
-export class HttpGetClientSpy<T> implements HttpGetClient<T> {
+export class HttpGetClientSpy<T = any> implements HttpGetClient<T> {
   url: string
+  headers?: any
   response: HttpResponse<T> = {
     statusCode: HttpStatusCode.ok
   }
 
   async get (params: HttpGetParams): Promise<HttpResponse<T>> {
     this.url = params.url
+    this.headers = params.headers
     return this.response
   }
 }
