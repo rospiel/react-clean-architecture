@@ -11,7 +11,7 @@ export class AuthorizeHttpGetClientDecorator implements HttpGetClient {
         if (account?.accessToken) {
             Object.assign(params, {
                 headers: Object.assign(this.mergeOrEmptyObject(params), {
-                    'X-Access-Token': account.accessToken
+                    'x-access-token': account.accessToken
                 })
             })
         }

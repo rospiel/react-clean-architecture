@@ -4,17 +4,15 @@ import { Header, Icon, IconType, Logo } from '@/presentation/components'
 import Footer from '@/presentation/components/footer/footer'
 import { LoadSurveyList } from '@/domain/usecases'
 import { SurveyModel } from '@/domain/models'
-import { useHistory } from 'react-router'
-import apiContext from '@/presentation/contexts/api/api-context'
-import { AccessDeniedError } from '@/domain/errors'
+import useErrorHandler from '@/presentation/hooks/use-error-handler'
+
 
 type SurveyListProps = {
     loadSurveyList: LoadSurveyList
 }
 
 export default function SurveyList (props: SurveyListProps): JSX.Element {
-    const history = useHistory()
-    const { setCurrentAccount } = useContext(apiContext)
+    const handleError = useErrorHandler({ callback })
     const [state, setState] = useState({
         surveys: [] as SurveyModel[], 
         error: '', 
@@ -24,18 +22,13 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
     useEffect(() => {
         props.loadSurveyList.all()
             .then(surveys => setState({ ...state, surveys }))
-            .catch(error => {
-                if (error instanceof AccessDeniedError) {
-                    setCurrentAccount(undefined)
-                    history.replace('/login')
-                    return
-                }
-
-                setState({ ...state, error: error.message })
-
-            })
+            .catch(handleError)
         
     }, [state.reload])
+
+    function callback (error: Error): void {
+        setState({ ...state, error: error.message })
+    }
 
     function setupIcon (survey: SurveyModel): IconType {
         return survey.didAnswer ? IconType.thumbUp : IconType.thumbDown
