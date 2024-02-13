@@ -22,7 +22,12 @@ function makeSut(url: string = faker.internet.url()): SutTypes {
 describe('RemoteLoadSurveyList', function () {
     test('Should call HttpGetClient with correct address', async function () {
         const url = faker.internet.url()
+        const body = mockSurveyListModel()
         const sut = makeSut(url)
+        sut.httpGetClientSpy.response = {
+            statusCode: HttpStatusCode.ok,
+            body
+        }
         await sut.remoteLoadSurveyList.all()
         expect(sut.httpGetClientSpy.url).toBe(url)
     })

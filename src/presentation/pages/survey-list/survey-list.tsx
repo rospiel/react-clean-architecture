@@ -23,7 +23,7 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
         props.loadSurveyList.all()
             .then(surveys => setState({ ...state, surveys }))
             .catch(handleError)
-        
+
     }, [state.reload])
 
     function callback (error: Error): void {

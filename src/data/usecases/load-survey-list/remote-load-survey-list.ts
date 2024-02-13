@@ -13,9 +13,9 @@ export class RemoteLoadSurveyList implements LoadSurveyList {
         const response = await this.httpGetClient.get({
             url: this.url
         })
-
+        
         switch (response.statusCode) {
-            case HttpStatusCode.ok: return response.body
+            case HttpStatusCode.ok: return response.body.map(value => Object.assign(value, { date: new Date(value.date)}))
             case HttpStatusCode.noContent: return []
             case HttpStatusCode.forbidden: throw new AccessDeniedError()
             default: throw new UnexpectedError()

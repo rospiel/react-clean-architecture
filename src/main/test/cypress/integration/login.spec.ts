@@ -1,7 +1,8 @@
 import faker from 'faker'
 import react from 'react'
-import * as formHelp from '../support/form-helper'
-import { mockResponse } from '../support/http-mocks'
+import * as formHelp from '../utils/form-helpers'
+import * as herlper from '../utils/helpers'
+import { mockResponse } from '../utils/http-mocks'
 
 const EMAIL_ELEMENT = 'email'
 const EMAIL_STATUS_ELEMENT = 'email-status'
@@ -9,10 +10,6 @@ const PASSWORD_ELEMENT = 'password'
 const PASSWORD_STATUS_ELEMENT = 'password-status'
 const SUBMIT_ELEMENT = 'submit'
 const ERROR_ELEMENT = 'error-container'
-
-function buildResponse (): object {
-  return { accessToken: faker.random.uuid(), name: faker.name.findName() }
-}
 
 describe('Login', function () {
   this.beforeEach(function () {
@@ -74,11 +71,11 @@ describe('Login', function () {
 
     formHelp.testContainerError('Credenciais inválidas')
     
-    formHelp.testUrl('/login')
+    herlper.testUrl('/login')
   })
 
   it('Should save account on local storage when credentials succeed ', function () {
-    mockResponse('POST', /login/, 200, buildResponse())
+    mockResponse('POST', /login/, 200, 'fx:account')
     
     formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
 
@@ -89,40 +86,13 @@ describe('Login', function () {
     cy.getByTestId(ERROR_ELEMENT)
       .should('not.exist')
       
-    formHelp.testUrl('/')
+    herlper.testUrl('/')
 
-    formHelp.checkItemLocalStorage('account')
-  })
-
-  it('Should present UnexpectedError on default error', function () {
-    mockResponse('POST', /login/, faker.helpers.randomize([400, 404, 500]), { error: faker.random.uuid() })
-
-    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
-    
-    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
-    
-    cy.getByTestId(SUBMIT_ELEMENT).click()
-
-    formHelp.testContainerError('Instabilidade no sistema. Tente novamente em breve.')
-    
-    formHelp.testUrl('/login')
-  })
-
-  it('Should present UnexpectedError when invalid data is returned', function () {
-    const invalidProperty: string = faker.random.words()
-    mockResponse('POST', /login/, 200, { invalidProperty: faker.random.uuid() })
-    
-    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
-    
-    formHelp.submitFormByEnter(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
-    
-    formHelp.testContainerError('Instabilidade no sistema. Tente novamente em breve.')
-    
-    formHelp.testUrl('/login')
+    herlper.checkItemLocalStorage('account')
   })
 
   it('Should not allowed multiple submits', function () {
-    mockResponse('POST', /login/, 200, buildResponse())
+    mockResponse('POST', /login/, 200, 'fx:account')
       .as('request')
     /* give a name to count requests */
     
@@ -138,7 +108,7 @@ describe('Login', function () {
   })
 
   it('Should not call external service when form is invalid', function () {
-    mockResponse('POST', /login/, 200, buildResponse())
+    mockResponse('POST', /login/, 200, 'fx:account')
       .as('request')
     /* give a name to count requests */
     

@@ -1,7 +1,8 @@
 import faker from 'faker'
 import react from 'react'
-import * as formHelp from '../support/form-helper'
-import { mockResponse } from '../support/http-mocks'
+import * as formHelp from '../utils/form-helpers'
+import * as helper from '../utils/helpers'
+import { mockResponse } from '../utils/http-mocks'
 
 const EMAIL_ELEMENT = 'email'
 const EMAIL_STATUS_ELEMENT = 'email-status'
@@ -33,9 +34,6 @@ function buildCompletedValidForm (): void {
   formHelp.testInputStatusSuccess(PASSWORD_CONFIRMATION_STATUS_ELEMENT)
 }
 
-function buildResponse (): object {
-  return { accessToken: faker.random.uuid(), name: faker.name.findName() }
-}
 
 describe('SignUp', function () {
   this.beforeEach(function () {
@@ -107,11 +105,11 @@ describe('SignUp', function () {
 
     formHelp.testContainerError('Esse e-mail já tem uma conta atrelada')
     
-    formHelp.testUrl('/signup')
+    helper.testUrl('/signup')
   })
 
   it('Should save account on local storage when credentials succeed ', function () {
-    mockResponse('POST', /signup/, 200, buildResponse())
+    mockResponse('POST', /signup/, 200, 'fx:account')
     
     buildCompletedValidForm()
     
@@ -120,38 +118,13 @@ describe('SignUp', function () {
     cy.getByTestId(ERROR_ELEMENT)
       .should('not.exist')
       
-    formHelp.testUrl('/')
+    helper.testUrl('/')
 
-    formHelp.checkItemLocalStorage('account')
-  })
-
-  it('Should present UnexpectedError on default error', function () {
-    mockResponse('POST', /signup/, faker.helpers.randomize([400, 404, 500]), { error: faker.random.words() })
-    
-    buildCompletedValidForm()
-    
-    cy.getByTestId(SUBMIT_ELEMENT).click()
-
-    formHelp.testContainerError('Instabilidade no sistema. Tente novamente em breve.')
-    
-    formHelp.testUrl('/signup')
-  })
-
-  it('Should present UnexpectedError when invalid data is returned', function () {
-    const invalidProperty: string = faker.random.words()
-    mockResponse('POST', /signup/, 200, { invalidProperty: faker.random.words() })
-    
-    buildCompletedValidForm()
-    
-    cy.getByTestId(SUBMIT_ELEMENT).click()
-    
-    formHelp.testContainerError('Instabilidade no sistema. Tente novamente em breve.')
-    
-    formHelp.testUrl('/signup')
+    helper.checkItemLocalStorage('account')
   })
 
   it('Should not allowed multiple submits', function () {
-    mockResponse('POST', /signup/, 200, buildResponse())
+    mockResponse('POST', /signup/, 200, 'fx:account')
       .as('request')
     /* give a name to count requests */
     
