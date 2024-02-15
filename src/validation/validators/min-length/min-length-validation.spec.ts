@@ -20,7 +20,7 @@ describe('MinLengthValidation', () => {
   })
 
   test('Should not return error when not found field on object', () => {
-    const sut = makeSut(faker.database.column())
+    const sut = makeSut('field')
     const error = sut.validate({ [faker.database.column()]: faker.random.alphaNumeric(5) })
     expect(error).toBeFalsy()
   })
