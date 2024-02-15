@@ -26,7 +26,7 @@ module.exports = merge(common, {
       }]
     },
     devServer: {
-      contentBase: path.join(__dirname, 'dist'),
+      contentBase: path.join(__dirname, 'docs'),
       writeToDisk: true,
       historyApiFallback: true
     },
