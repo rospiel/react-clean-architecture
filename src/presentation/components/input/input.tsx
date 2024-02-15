@@ -21,10 +21,13 @@ export default function Input (props: InputProps): React.ReactElement {
   }
 
   function handleChange (event: React.FocusEvent<HTMLInputElement>): void {
-    setState({
-      ...state,
-      [event.target.name]: event.target.value
-    })
+    const name = event.target.name
+    const value = event.target.value
+
+    setState(prevState =>({
+      ...prevState,
+      [name]: value
+    }))
   }
 
   return (

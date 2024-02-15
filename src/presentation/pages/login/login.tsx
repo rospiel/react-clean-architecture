@@ -41,12 +41,12 @@ export default function Login (props: LoginProps): JSX.Element {
   useEffect(() => {
     const formData = { email: state.email, password: state.password }
 
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       emailError: props.validation.validate('email', formData),
       passwordError: props.validation.validate('password', formData)
 
-    })
+    }))
   }, [state.email, state.password])
 
   function hasError (): boolean {
@@ -60,10 +60,10 @@ export default function Login (props: LoginProps): JSX.Element {
       return
     }
 
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       isLoading: true
-    })
+    }))
 
     try {
       const response = await props.authentication.auth({
@@ -74,11 +74,11 @@ export default function Login (props: LoginProps): JSX.Element {
       setCurrentAccount(response)
       history.replace('/')
     } catch (error) {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isLoading: false,
         message: error.message
-      })
+      }))
     }
   }
 

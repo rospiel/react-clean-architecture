@@ -49,13 +49,13 @@ export default function SignUp (props: SignUpProps): JSX.Element {
   useEffect(() => {
     const formData = { name: state.name, email: state.email, password: state.password, passwordConfirmation: state.passwordConfirmation }
 
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       nameError: props.validation.validate('name', formData),
       emailError: props.validation.validate('email', formData),
       passwordError: props.validation.validate('password', formData),
       passwordConfirmationError: props.validation.validate('passwordConfirmation', formData)
-    })
+    }))
   }, [state.name, state.email, state.password, state.passwordConfirmation])
 
   function hasError (): boolean {
@@ -69,10 +69,10 @@ export default function SignUp (props: SignUpProps): JSX.Element {
       return
     }
 
-    setState({
-      ...state,
+    setState(prevState => ({
+      ...prevState,
       isLoading: true
-    })
+    }))
 
     try {
       const account = await props.addAccount.add({
@@ -85,11 +85,11 @@ export default function SignUp (props: SignUpProps): JSX.Element {
       setCurrentAccount(account)
       history.replace('/')
     } catch (error) {
-      setState({
-        ...state,
+      setState(prevState => ({
+        ...prevState,
         isLoading: false,
         message: error.message
-      })
+      }))
     }
   }
 
