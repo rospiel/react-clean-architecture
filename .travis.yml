@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - 14
+before_install:
+  - npm install -g npm@7.24.2
+script:
+  - npm run test:ci
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  on:
+    branch: main
