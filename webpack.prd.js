@@ -33,10 +33,16 @@ module.exports = merge(common, {
     },
     plugins: [
       new DefinePlugin({
-        'process.env.API_URL': JSON.stringify('http://191.183.30.225:5050/api')
+        'process.env.API_URL': JSON.stringify('http://191.183.30.225:5050/api'), 
+        'process.env.PLACE': JSON.stringify('production')
       }), 
       new HtmlWebpackPlugin({
-        template: './template.prd.html'
+        filename: 'index.html',
+        template: './template.prd.html' 
+      }),
+      new HtmlWebpackPlugin({
+        filename: '404.html',
+        template: './404.html', 
       }),
       new MiniCssExtractPlugin({
         filename: 'main-bundle-[hash].css'

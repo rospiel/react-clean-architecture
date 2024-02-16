@@ -8,13 +8,19 @@ import { PrivateRoute } from '@/presentation/components'
 import MakeSurveyList from '@/main/factories/pages/survey-list/survey-list-factory'
 
 export default function Router (): JSX.Element {
+  const PLACE = `${process.env.PLACE}`
+
+  function getBaseName (): string {
+    return PLACE == 'production' ? '/react-clean-architecture' : ''
+  }
+
   return (
     <ApiContext.Provider 
       value={{
         setCurrentAccount: setCurrentAccountAdapter,
         getCurrentAccount: getCurrentAccountAdapter
       }}>
-      <BrowserRouter>
+      <BrowserRouter basename={getBaseName()}>
         <Switch>
           <Route path="/login" exact component={makeLogin} />
           <Route path="/signup" exact component={makeSignUp} />

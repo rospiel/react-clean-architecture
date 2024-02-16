@@ -5,10 +5,12 @@ before_install:
   - npm install -g npm@7.24.2
 script:
   - npm run test:ci
+  - npm run build
 deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   keep_history: true
+  local_dir: public
   on:
     branch: main

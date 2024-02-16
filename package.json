@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "",
   "main": "index.js",
+  "homepage": "https://rospiel.github.io/react-clean-architecture",
   "scripts": {
     "start": "node index",
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --passWithNoTests --no-cache --runInBand",
