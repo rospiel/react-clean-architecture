@@ -1,10 +1,18 @@
 language: node_js
 node_js:
   - 14
+addons:
+  packages:
+    - libgconf-2-4
+cache:
+  npm: true
+  directories:
+    - ~/.cache    
 before_install:
   - npm install -g npm@7.24.2
 script:
   - npm run test:ci
+  - npm run test:cypress:ci
   - npm run build
 deploy:
   provider: pages
@@ -14,3 +22,5 @@ deploy:
   local_dir: public
   on:
     branch: main
+notifications:
+  email: false    

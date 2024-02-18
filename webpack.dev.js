@@ -28,7 +28,8 @@ module.exports = merge(common, {
     devServer: {
       contentBase: path.join(__dirname, 'dist'),
       writeToDisk: true,
-      historyApiFallback: true
+      historyApiFallback: true, 
+      port: 8080
     },
     plugins: [
       new DefinePlugin({

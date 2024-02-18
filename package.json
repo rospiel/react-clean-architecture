@@ -10,10 +10,13 @@
     "test:watch": "npm test -- --watch",
     "test:staged": "npm test -- --findRelatedTests",
     "test:ci": "npm test -- --coverage",
-    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "dev:base": "webpack-dev-server --config webpack.dev.js",
+    "dev": "npm run dev:base -- --open",
     "build": "webpack --config webpack.prd.js",
     "check": "npm-check -u -s",
-    "test:cypress": "cypress open"
+    "test:cypress": "cypress open",
+    "test:cypress:run": "cypress run",
+    "test:cypress:ci": "start-server-and-test dev:base http-get://localhost:8080 test:cypress:run"
   },
   "keywords": [],
   "author": "",
@@ -55,6 +58,7 @@
     "mini-css-extract-plugin": "0.9.0",
     "node-sass": "4.14.1",
     "sass-loader": "8.0.2",
+    "start-server-and-test": "1.11.0",
     "style-loader": "1.2.1",
     "ts-jest": "26.0.0",
     "ts-loader": "7.0.4",
