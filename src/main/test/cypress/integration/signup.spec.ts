@@ -133,6 +133,8 @@ describe('SignUp', function () {
     /* simulate double click */
     cy.getByTestId(SUBMIT_ELEMENT).dblclick()
 
+    cy.wait('@request')
+
     /* verify if just call one time */
     cy.get('@request.all').should('have.length', 1)
   })

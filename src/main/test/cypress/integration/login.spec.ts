@@ -103,6 +103,9 @@ describe('Login', function () {
     /* simulate double click */
     cy.getByTestId(SUBMIT_ELEMENT).dblclick()
 
+    /* wait to conforme how many times calls service */
+    cy.wait('@request')
+
     /* verify if just call one time */
     cy.get('@request.all').should('have.length', 1)
   })
