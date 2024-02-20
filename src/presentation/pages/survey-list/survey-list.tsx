@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Styles from './survey-list-styles.scss'
-import { Header, Icon, IconType, Logo } from '@/presentation/components'
+import { Calendar, Header, Icon, IconType, Logo } from '@/presentation/components'
 import Footer from '@/presentation/components/footer/footer'
 import { LoadSurveyList } from '@/domain/usecases'
 import { SurveyModel } from '@/domain/models'
 import useErrorHandler from '@/presentation/hooks/use-error-handler'
+import Error from '@/presentation/components/error/error'
+import { Link } from 'react-router-dom'
 
 
 type SurveyListProps = {
@@ -21,13 +23,13 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
     
     useEffect(() => {
         props.loadSurveyList.all()
-            .then(surveys => setState({ ...state, surveys }))
+            .then(surveys => setState(prevState => ({ ...prevState, surveys })))
             .catch(handleError)
 
     }, [state.reload])
 
     function callback (error: Error): void {
-        setState({ ...state, error: error.message })
+        setState(prevState => ({ ...prevState, error: error.message }))
     }
 
     function setupIcon (survey: SurveyModel): IconType {
@@ -56,16 +58,6 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
 
     }
 
-    function buildErrorComponent (): JSX.Element {
-        return (
-            <div className={Styles.surveyContainer__error}>
-                <span className={Styles.surveyContainer__errorSpan} data-testid="error">{state.error}</span>
-                <button data-testid="reload" onClick={handleReload}>Recarregar</button>
-            </div>
-        )
-
-    }
-
     function buildBodyComponent (): JSX.Element {
         return (
             <ul data-testid="survey-list">
@@ -75,15 +67,13 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
                             <li key={survey.id}>
                                 <div className={Styles.contentContainer__content}>
                                     <Icon iconType={setupIcon(survey)} className={Styles.contentContainer__iconContainer} />
-                                    <time>
-                                        <span data-testid="day" className={Styles.day}>{survey.date.getDate().toString().padStart(2, '0')}</span>
-                                        <span data-testid="month" className={Styles.month}>{survey.date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '')}</span>
-                                        <span data-testid="year" className={Styles.year}>{survey.date.getFullYear()}</span>
-                                    </time>
+                                    <Calendar date={survey.date} className={Styles.contentContainer__calendar} />
                                     <p data-testid="question">{survey.question}</p>
                                 </div>
                                 <div className={Styles.contentContainer__result}>
-                                    Ver Resultado
+                                    <Link data-testid="link" to={`/surveys/${survey.id}`}>
+                                        Ver Resultado
+                                    </Link>
                                 </div>
                             </li>
                         )
@@ -97,7 +87,7 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
 
     if (state.error) {
         return (
-            buildBaseComponent(buildErrorComponent())
+            buildBaseComponent(<Error message={state.error} reload={handleReload} />)
         )
     }
 

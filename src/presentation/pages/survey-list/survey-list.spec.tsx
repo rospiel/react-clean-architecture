@@ -13,7 +13,7 @@ import { AccountModel } from '@/domain/models'
 type SutTypes = {
     loadSurveyListSpy: LoadSurveyListSpy
     history: MemoryHistory
-  setCurrentAccountMock: (account: AccountModel) => void
+    setCurrentAccountMock: (account: AccountModel) => void
 }
 
 function makeSut (loadSurveyListSpy: LoadSurveyListSpy = new LoadSurveyListSpy()): SutTypes {
@@ -109,5 +109,15 @@ describe('SurveyList component', function () {
         fireEvent.click(screen.getByTestId('reload'))
         expect(loadSurveyListSpy.callsCount).toBe(1)
         await waitFor(() => screen.getByRole('heading'))
+    })
+
+    test('Should redirect to SurveyResult when click on show result', async function () {
+        const survey = mockSurveyModel()
+        let loadSurveyListSpy = new LoadSurveyListSpy()
+        loadSurveyListSpy.surveys = [survey]
+        const { history } = makeSut(loadSurveyListSpy)
+        await waitFor(() => screen.getByRole('heading'))
+        fireEvent.click(screen.getByTestId('link'))
+        expect(history.location.pathname).toBe('/surveys/'.concat(survey.id))
     })
 })

@@ -1,0 +1,16 @@
+{
+    "question": "Best framework web?",
+    "date": "2030-05-09T00:00:00",
+    "answers": [{
+      "image": "https://vuejs.org/images/logo.png",
+      "answer": "Vue",
+      "count": 30,
+      "percent": 50,
+      "isCurrentAccountAnswer": false
+    }, {
+      "answer": "React",
+      "count": 40,
+      "percent": 60,
+      "isCurrentAccountAnswer": true
+    }]
+  }
