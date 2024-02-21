@@ -5,6 +5,11 @@ const common = require('./webpack.common')
 const merge = require('webpack-merge')
 
 module.exports = merge(common, {
+    output: {
+      path: path.join(__dirname, 'public'),
+      filename: 'main-bundle-[hash].js',
+      publicPath: '/'
+    },
     mode: 'development',
     module: {
       rules: [{

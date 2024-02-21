@@ -1,3 +1,4 @@
+const path = require('path')
 const { DefinePlugin } = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -5,6 +6,11 @@ const common = require('./webpack.common')
 const merge = require('webpack-merge')
 
 module.exports = merge(common, {
+    output: {
+      path: path.join(__dirname, 'public'),
+      filename: 'main-bundle-[hash].js',
+      publicPath: ''
+    },
     mode: 'production',
     module: {
       rules: [{
@@ -33,7 +39,7 @@ module.exports = merge(common, {
     },
     plugins: [
       new DefinePlugin({
-        'process.env.API_URL': JSON.stringify('http://191.183.30.225:5050/api'), 
+        'process.env.API_URL': JSON.stringify('https://every-cougars-wink.loca.lt/api'), 
         'process.env.PLACE': JSON.stringify('production')
       }), 
       new HtmlWebpackPlugin({

@@ -12,7 +12,7 @@ export default function Router (): JSX.Element {
   const PLACE = `${process.env.PLACE}`
 
   function getBaseName (): string {
-    return PLACE == 'production' ? '/react-clean-architecture' : ''
+    return PLACE == 'production' ? '/react-clean-architecture-publish' : ''
   }
 
   return (
