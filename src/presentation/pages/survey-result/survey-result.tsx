@@ -6,7 +6,7 @@ import Loading from '@/presentation/components/loading/loading'
 import { LoadSurveyResultModel } from '@/domain/models'
 import { LoadSurveyResult } from '@/domain/usecases'
 import useErrorHandler from '@/presentation/hooks/use-error-handler'
-import { useHistory } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 type StateProps = {
     isLoading: boolean
@@ -31,10 +31,11 @@ function initialStateProps (reload: boolean = false): StateProps {
 export default function SurveyResult ({ loadSurveyResult }: SurveyResultProps): JSX.Element {
     const [state, setState] = useState<StateProps>(initialStateProps)
     const handleError = useErrorHandler({ callback })
-    const { goBack } = useHistory()
-
+    const navigate = useNavigate()
+    const { id } = useParams()
+    
     useEffect(() => {
-        loadSurveyResult.load()
+        loadSurveyResult.load(id)
         .then(response => {
             setState(prevState => ({
                 ...prevState, surveyResult: response
@@ -49,7 +50,7 @@ export default function SurveyResult ({ loadSurveyResult }: SurveyResultProps): 
     }
 
     function callback (error: Error): void {
-        setState(prevState => ({ ...prevState, surveyResult: null, error: error.message }))
+        setState(prevState => ({ ...prevState, surveyResult: null, reload: false, error: error.message }))
     }
 
     function getStyleBy (isCurrentAccountAnswer: boolean): string {
@@ -91,7 +92,7 @@ export default function SurveyResult ({ loadSurveyResult }: SurveyResultProps): 
                     }
                     
                 </ul>
-                <button data-testid="back-button" className={Styles.surveyResultContainer__content_button} onClick={goBack}>Voltar</button> 
+                <button data-testid="back-button" className={Styles.surveyResultContainer__content_button} onClick={() => navigate(-1)}>Voltar</button> 
                     
                 { state.isLoading && <Loading /> }
             </>

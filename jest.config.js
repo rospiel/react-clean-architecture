@@ -15,15 +15,12 @@ module.exports = {
   ],
   testEnvironment: 'jsdom',
   transform: {
-    '.+\\.(ts|tsx)$': 'ts-jest'
+    '.+\\.(ts|tsx)$': ['ts-jest', {
+      diagnostics: false
+    }]
   },
   moduleNameMapper: {
     '@/(.*)': '<rootDir>/src/$1',
     '\\.scss$': 'identity-obj-proxy'
-  },
-  globals: {
-    'ts-jest': {
-      diagnostics: false
-    }
   }
 }

@@ -1,10 +1,10 @@
 import { mockGetRequest } from '@/data/test'
 import Axios from 'axios'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 
 export const mockHttpResponse = (): any => ({
-  data: faker.random.objectElement(),
-  status: faker.random.number()
+  data: faker.person.fullName(),
+  status: faker.number.int()
 })
 
 export const mockAxios = (): jest.Mocked<typeof Axios> => {

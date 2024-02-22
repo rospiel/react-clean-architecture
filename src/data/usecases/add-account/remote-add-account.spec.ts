@@ -1,7 +1,7 @@
 import { HttpPostClientSpy } from '@/data/test'
 import { AccountModel } from '@/domain/models'
 import { RemoteAddAccount } from './remote-add-account'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { mockAccountModel, mockAddAccountParams } from '@/domain/test'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { EmailInUseError, UnexpectedError } from '@/domain/errors'

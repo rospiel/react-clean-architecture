@@ -1,15 +1,15 @@
 import { HttpPostClient, HttpPostClientParams, HttpResponse, HttpStatusCode, HttpGetParams, HttpGetClient } from '@/data/protocols/http'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 
 export const mockPostRequest = (): HttpPostClientParams => ({
   url: faker.internet.url(),
-  body: faker.random.objectElement()
+  body: faker.person.fullName()
 })
 
 export function mockGetRequest (): HttpGetParams {
   return {
     url: faker.internet.url(),
-    headers: faker.random.objectElement()
+    headers: faker.person.fullName()
   }
 } 
 

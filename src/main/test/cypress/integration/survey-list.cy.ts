@@ -1,5 +1,4 @@
 import * as Helper from '../utils/helpers'
-import faker from 'faker'
 import { mockResponse } from '../utils/http-mocks'
 
 const thumbDown = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAASCAYAAABb0P4QAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAFKADAAQAAAABAAAAEgAAAAA9nQVdAAAA70lEQVQ4Ea2RPQoCQQyFZ/w5g72lYOEVPIiV2IkIHmCvIZ5D77BgZWtrYWe1ICiuL8tEwjIZZmYNZCf7knyTzRrjrK7rAfwAr+AheyNZwiei98gNrBkISxYjz5KbZb0V4gXxlN8jzo+1tk91BOT6nhPmOFNg1Nb0UiCNxY0Uu8QW044BuMIZHs3DJzcra3/yOgem3UoT3pEcaQUh3TchAX9/KNTsy/mAtLebrzhXI+AqE/oQl55ErIfYxp5WothW71QyAJ0VWKG06DJAQ/jTA0yH0TUAzf4Gc8BFC5g3GcHI3IQvBy0asesDsB08CfYFB/44kX6+Hj8AAAAASUVORK5CYII='
@@ -13,23 +12,23 @@ describe('SurveyList', function () {
     })
     
     it('Should render error when throw UnexpectedError but if try again should render', function () {
-        mockResponse('GET', /surveys/, 500, { error: faker.random.words() })
+        mockResponse('GET', /surveys/, 500, 'error')
         cy.visit('')
         cy.getByTestId('error').should('contain.text', 'Instabilidade no sistema. Tente novamente em breve.')
 
-        mockResponse('GET', /surveys/, 200, 'fx:survey-list')
+        mockResponse('GET', /surveys/, 200, 'survey-list')
         cy.getByTestId('reload').click()
         cy.get('li:not(:empty)').should('have.length', 2)
     })
 
     it('Should logout when throw AccessDeniedError', function () {
-        mockResponse('GET', /surveys/, 403, { error: faker.random.words() })
+        mockResponse('GET', /surveys/, 403, 'error')
         cy.visit('')
         Helper.testUrl('/login')
     })
 
     it('Should render success', function () {
-        mockResponse('GET', /surveys/, 200, 'fx:survey-list')
+        mockResponse('GET', /surveys/, 200, 'survey-list')
         cy.visit('')
         const account = Helper.getLocalStorageItem('account')
         cy.getByTestId('username').should('contain.text', account.name)
@@ -47,7 +46,7 @@ describe('SurveyList', function () {
     })
 
     it('Should when request logout', function () {
-        mockResponse('GET', /surveys/, 200, [])
+        mockResponse('GET', /surveys/, 200, 'survey-list')
         cy.visit('')
         cy.getByTestId('logout').click()
         Helper.testUrl('/login')

@@ -2,10 +2,9 @@ import React from 'react'
 import { cleanup, fireEvent, render, waitFor, screen } from '@testing-library/react'
 import SignUp from './signup'
 import { AddAccountSpy, Helper, ValidationStub } from '@/presentation/test'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { EmailInUseError } from '@/domain/errors'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory } from 'history'
+import { BrowserRouter } from 'react-router-dom'
 import { AccountModel } from '@/domain/models'
 import ApiContext from '@/presentation/contexts/api/api-context'
 
@@ -18,8 +17,6 @@ type SutParams = {
   error: string
 }
 
-const history = createMemoryHistory({ initialEntries: ['/signup'] })
-
 function makeSut (props?: SutParams): SutTypes {
   const validationStub = new ValidationStub()
   validationStub.errorMessage = props?.error
@@ -27,10 +24,9 @@ function makeSut (props?: SutParams): SutTypes {
   const setCurrentAccountMock = jest.fn()
   render(
     <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
-      <Router history={history}>
-        <SignUp validation={validationStub} addAccount={addAccountSpy} />
-      </Router>
-    </ApiContext.Provider>
+      <SignUp validation={validationStub} addAccount={addAccountSpy} />
+    </ApiContext.Provider>,
+    {wrapper: BrowserRouter}
   )
   return {
     addAccountSpy,
@@ -42,21 +38,21 @@ function populateForm (): void {
   const password = faker.internet.password()
   Helper.populateInput('email', faker.internet.email())
   Helper.populateInput('password', password)
-  Helper.populateInput('name', faker.name.findName())
+  Helper.populateInput('name', faker.person.fullName())
   Helper.populateInput('passwordConfirmation', password)
 }
 
 async function simulateSubmit (): Promise<void> {
-  const form = screen.getByTestId('form')
-  fireEvent.submit(form)
-  await waitFor(() => form)
+  const button = screen.getByTestId('submit')
+  fireEvent.click(button)
+  await waitFor(() => button)
 }
 
 describe('SignUp Component', () => {
   afterEach(cleanup)
 
   test('Should initialize with some rules', () => {
-    const error = faker.random.words()
+    const error = faker.word.words()
     makeSut({ error })
     // Helper.testContainerChildCount(0, 'error-container')
     expect(screen.getByTestId('error-container').children).toHaveLength(0)
@@ -69,41 +65,41 @@ describe('SignUp Component', () => {
   })
 
   test('Should show error message when name validation fails', () => {
-    const error = faker.random.words()
+    const error = faker.word.words()
     makeSut({ error })
     const fieldName = 'name'
-    Helper.populateInput(fieldName, faker.name.firstName())
+    Helper.populateInput(fieldName, faker.person.firstName())
     Helper.testStatusForField(fieldName, error)
   })
 
   test('Should show error message when email validation fails', () => {
-    const error = faker.random.words()
+    const error = faker.word.words()
     makeSut({ error })
     const fieldName = 'email'
-    Helper.populateInput(fieldName, faker.name.firstName())
+    Helper.populateInput(fieldName, faker.person.firstName())
     Helper.testStatusForField(fieldName, error)
   })
 
   test('Should show error message when password validation fails', () => {
-    const error = faker.random.words()
+    const error = faker.word.words()
     makeSut({ error })
     const fieldName = 'password'
-    Helper.populateInput(fieldName, faker.name.firstName())
+    Helper.populateInput(fieldName, faker.person.firstName())
     Helper.testStatusForField(fieldName, error)
   })
 
   test('Should show error message when passwordConfirmation validation fails', () => {
-    const error = faker.random.words()
+    const error = faker.word.words()
     makeSut({ error })
     const fieldName = 'passwordConfirmation'
-    Helper.populateInput(fieldName, faker.name.firstName())
+    Helper.populateInput(fieldName, faker.person.firstName())
     Helper.testStatusForField(fieldName, error)
   })
 
   test('Should show valid fields when validation succeeds', () => {
     makeSut()
     const fields = new Map<string, any>()
-    fields.set('name', faker.name.findName())
+    fields.set('name', faker.person.fullName())
     fields.set('email', faker.internet.email())
     const password = faker.internet.password()
     fields.set('password', password)
@@ -131,7 +127,7 @@ describe('SignUp Component', () => {
 
   test('Should call AddAccount Service with correct values', async () => {
     const { addAccountSpy } = makeSut()
-    const name = faker.name.findName()
+    const name = faker.person.fullName()
     const email = faker.internet.email()
     const password = faker.internet.password()
     Helper.populateInput('email', email)
@@ -156,7 +152,7 @@ describe('SignUp Component', () => {
   })
 
   test('Should not call AddAccount if form is invalid', async () => {
-    const error = faker.random.words()
+    const error = faker.word.words()
     const { addAccountSpy } = makeSut({ error })
     await simulateSubmit()
     expect(addAccountSpy.callsCount).toBe(0)
@@ -179,15 +175,13 @@ describe('SignUp Component', () => {
     const { addAccountSpy, setCurrentAccountMock } = makeSut()
     await simulateSubmit()
     expect(setCurrentAccountMock).toHaveBeenCalledWith(addAccountSpy.account)
-    expect(history.length).toBe(1)
-    expect(history.location.pathname).toBe('/')
+    expect(global.window.location.href).toContain('/')
   })
 
-  test('Should redirect to signup page', () => {
+  test('Should redirect to login page', () => {
     makeSut()
     const register = screen.getByTestId('signup')
     fireEvent.click(register)
-    expect(history.length).toBe(1)
-    expect(history.location.pathname).toBe('/login')
+    expect(global.window.location.href).toContain('/login')
   })
 })

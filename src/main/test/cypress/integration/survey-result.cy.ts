@@ -1,33 +1,36 @@
 import * as Helper from '../utils/helpers'
-import faker from 'faker'
-import { mockResponse } from '../utils/http-mocks'
+import { mockResponse, mockResponseBy } from '../utils/http-mocks'
+import { faker } from '@faker-js/faker'
 
 describe('SurveyResult', function () {
     
+    const idSurvey = faker.string.alphanumeric()
+    const url = `/api/surveys/${idSurvey}/results`
+    const visit = `/surveys/${idSurvey}`
     
     beforeEach(function () {
         cy.fixture('account').then(value => Helper.setLocalStorageItem('account', value))
     })
     
     it('Should render error when throw UnexpectedError but if try again should render', function () {
-        mockResponse('GET', /surveys/, 500, { error: faker.random.words() })
-        cy.visit('surveys/id')
+        mockResponseBy('GET', url, 500, 'error')
+        cy.visit(visit)
         cy.getByTestId('error').should('contain.text', 'Instabilidade no sistema. Tente novamente em breve.')
 
-        mockResponse('GET', /surveys/, 200, 'fx:survey-result')
+        mockResponseBy('GET', url, 200, 'survey-result')
         cy.getByTestId('reload').click()
         cy.get('li:not(:empty)').should('have.length', 2)
     })
 
     it('Should logout when throw AccessDeniedError', function () {
-        mockResponse('GET', /surveys/, 403, { error: faker.random.words() })
-        cy.visit('surveys/id')
+        mockResponseBy('GET', url, 403, 'error')
+        cy.visit(visit)
         Helper.testUrl('/login')
     })
 
     it('Should render success', function () {
-        mockResponse('GET', /surveys/, 200, 'fx:survey-result')
-        cy.visit('surveys/id')
+        mockResponseBy('GET', url, 200, 'survey-result')
+        cy.visit(visit)
         const account = Helper.getLocalStorageItem('account')
         const surveyResult = cy.fixture('survey-result')
         cy.getByTestId('username').should('contain.text', account.name)
@@ -51,11 +54,11 @@ describe('SurveyResult', function () {
     })
 
     it('Should redirect to previous page when click go back', function () {
-        mockResponse('GET', /surveys/, 200, 'fx:survey-result')
+        mockResponseBy('GET', url, 200, 'survey-result')
         cy.visit('')
-        cy.visit('surveys/id')
+        cy.visit(visit)
         cy.getByTestId('back-button').click()
-        mockResponse('GET', /surveys/, 200, 'fx:survey-list')
+        mockResponseBy('GET', 'api/surveys', 200, 'survey-list')
         Helper.testUrl('/')
     })
 })

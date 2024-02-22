@@ -29,7 +29,7 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
     }, [state.reload])
 
     function callback (error: Error): void {
-        setState(prevState => ({ ...prevState, error: error.message }))
+        setState(prevState => ({ ...prevState, reload: false, error: error.message }))
     }
 
     function setupIcon (survey: SurveyModel): IconType {
@@ -46,7 +46,7 @@ export default function SurveyList (props: SurveyListProps): JSX.Element {
 
     function buildBaseComponent (body: JSX.Element): JSX.Element {
         return (
-            <div className={Styles.surveyContainer}>
+            <div data-testid="survey-list-page" className={Styles.surveyContainer}>
                 <Header />
                 <main className={Styles.surveyContainer__contentContainer}>
                     <h2>Enquetes</h2>

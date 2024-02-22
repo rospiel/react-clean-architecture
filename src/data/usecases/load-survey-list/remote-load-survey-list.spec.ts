@@ -1,5 +1,5 @@
 import { HttpGetClientSpy } from '@/data/test'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { RemoteLoadSurveyList } from './remote-load-survey-list'
 import { SurveyModel } from '@/domain/models'
 import { HttpStatusCode } from '@/data/protocols/http'

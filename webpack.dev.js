@@ -2,7 +2,7 @@ const path = require('path')
 const { DefinePlugin } = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const common = require('./webpack.common')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 
 module.exports = merge(common, {
     output: {
@@ -31,8 +31,10 @@ module.exports = merge(common, {
       }]
     },
     devServer: {
-      contentBase: path.join(__dirname, 'dist'),
-      writeToDisk: true,
+      static: path.join(__dirname, 'dist'),
+      devMiddleware: {
+        writeToDisk: true,
+      },
       historyApiFallback: true, 
       port: 8080
     },

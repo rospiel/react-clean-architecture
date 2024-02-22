@@ -1,19 +1,19 @@
 import { SurveyModel } from '@/domain/models'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { LoadSurveyList } from '@/domain/usecases/load-survey-list'
 
 export function mockSurveyModel (): SurveyModel {
     return {
-        id: faker.random.uuid(),
-        question: faker.random.words(9),
+        id: faker.string.uuid(),
+        question: faker.word.words(9),
         answers: [{
-            answer: faker.random.words(5),
+            answer: faker.word.words(5),
             image: faker.internet.url()
         }, 
         {
-            answer: faker.random.words(5)
+            answer: faker.word.words(5)
         }],
-        didAnswer: faker.random.boolean(),
+        didAnswer: faker.datatype.boolean(),
         date: faker.date.recent()
     }
 }

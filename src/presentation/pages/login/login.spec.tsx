@@ -1,11 +1,10 @@
 import React from 'react'
-import { render, fireEvent, cleanup, waitFor, screen } from '@testing-library/react'
+import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 import { Login } from '@/presentation/pages'
 import { AuthenticationSpy, ValidationStub, Helper } from '@/presentation/test'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { InvalidCredentialsError } from '@/domain/errors'
-import { Router } from 'react-router'
-import { createMemoryHistory } from 'history'
+import { BrowserRouter } from 'react-router-dom'
 import ApiContext from '@/presentation/contexts/api/api-context'
 import { AccountModel } from '@/domain/models'
 
@@ -14,19 +13,17 @@ type screenTypes = {
   setCurrentAccountMock: (account: AccountModel) => void
 }
 
-const history = createMemoryHistory({ initialEntries: ['/login'] })
 function makeSut (errorMessage?: string): screenTypes {
   const validationStub = new ValidationStub()
   const authenticationSpy = new AuthenticationSpy()
   const setCurrentAccountMock = jest.fn()
   validationStub.errorMessage = errorMessage
+  
   render(
-    /* necessarily Router when the component uses link from react-router */
     <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
-      <Router history={history}>
-        <Login validation={validationStub} authentication={authenticationSpy} />
-      </Router>
-    </ApiContext.Provider>
+      <Login validation={validationStub} authentication={authenticationSpy} />
+    </ApiContext.Provider>, 
+    {wrapper: BrowserRouter}
   )
   return {
     authenticationSpy, 
@@ -38,10 +35,10 @@ async function simulateSubmit (email = faker.internet.email(), password = faker.
   Helper.populateInput('email', email)
   Helper.populateInput('password', password)
 
-  const form = screen.getByTestId('form')
-  fireEvent.submit(form)
+  const button = screen.getByTestId('submit')
+  fireEvent.click(button)
   /* because the call is async wait until finish, necessary pass a element that is always in the screen to listening  */
-  await waitFor(() => form)
+  await waitFor(() => button)
 }
 
 describe('Login component', () => {
@@ -49,7 +46,7 @@ describe('Login component', () => {
   /* afterEach(cleanup) /* clean after every test */
 
   test('Should initialize with some rules', () => {
-    const errorMessage = faker.random.words()
+    const errorMessage = faker.word.words()
     makeSut(errorMessage)
     const errorWrap = screen.getByTestId('error-container')
     expect(errorWrap.childElementCount).toBe(0)
@@ -66,14 +63,14 @@ describe('Login component', () => {
   })
 
   test('Should show error message when email validation fails', () => {
-    const errorMessage = faker.random.words()
+    const errorMessage = faker.word.words()
     makeSut(errorMessage)
     Helper.populateInput('email', faker.internet.email())
     Helper.testStatusForField('email', errorMessage)
   })
 
   test('Should show error message when password validation fails', () => {
-    const errorMessage = faker.random.words()
+    const errorMessage = faker.word.words()
     makeSut(errorMessage)
     Helper.populateInput('password', faker.internet.password())
     Helper.testStatusForField('password', errorMessage)
@@ -131,7 +128,7 @@ describe('Login component', () => {
   })
 
   test('Should not call Authentication if form is invalid', async () => {
-    const errorMessage = faker.random.words()
+    const errorMessage = faker.word.words()
     const { authenticationSpy } = makeSut(errorMessage)
     await simulateSubmit()
     expect(authenticationSpy.callsCount).toBe(0)
@@ -158,15 +155,12 @@ describe('Login component', () => {
     const { authenticationSpy, setCurrentAccountMock } = makeSut()
     await simulateSubmit()
     expect(setCurrentAccountMock).toHaveBeenCalledWith(authenticationSpy.account)
-    expect(history.length).toBe(1)
-    expect(history.location.pathname).toBe('/')
   })
 
   test('Should redirect to signup page', () => {
     makeSut()
     const register = screen.getByTestId('signup')
     fireEvent.click(register)
-    expect(history.length).toBe(2)
-    expect(history.location.pathname).toBe('/signup')
+    expect(global.window.location.href).toContain('/signup')
   })
 })

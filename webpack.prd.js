@@ -3,7 +3,7 @@ const { DefinePlugin } = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const common = require('./webpack.common')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 
 module.exports = merge(common, {
     output: {

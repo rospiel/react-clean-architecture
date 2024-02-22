@@ -9,9 +9,9 @@ export class RemoteLoadSurveyResult implements LoadSurveyResult {
         private readonly httpGetClient: HttpGetClient<LoadSurveyResultModel>
     ) {}
 
-    async load (): Promise<LoadSurveyResultModel> {
+    async load (id: string): Promise<LoadSurveyResultModel> {
         const response = await this.httpGetClient.get({
-            url: this.url
+            url: this.url.replace('{id}', id)
         })
         
         switch (response.statusCode) {

@@ -1,4 +1,4 @@
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import react from 'react'
 import * as formHelp from '../utils/form-helpers'
 import * as herlper from '../utils/helpers'
@@ -35,11 +35,11 @@ describe('Login', function () {
   })
 
   it('Should show error when form is invalid', function () {
-    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.random.alphaNumeric(3))
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.string.alphanumeric(3))
     
     formHelp.testInputStatus(EMAIL_STATUS_ELEMENT, 'Valor inválido', '🔴')
       
-    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(3))
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.string.alphanumeric(3))
     
     formHelp.testInputStatus(PASSWORD_STATUS_ELEMENT, 'Valor inválido', '🔴')
   })
@@ -49,7 +49,7 @@ describe('Login', function () {
     
     formHelp.testInputStatus(EMAIL_STATUS_ELEMENT, 'Tudo certo', '🟢')
 
-    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.string.alphanumeric(5))
     
     formHelp.testInputStatus(PASSWORD_STATUS_ELEMENT, 'Tudo certo', '🟢')
 
@@ -61,11 +61,11 @@ describe('Login', function () {
   })
 
   it('Should show error when credentials failed', function () {
-    mockResponse('POST', /login/, 401, { error: faker.random.words() })
+    mockResponse('POST', /login/, 401, 'error')
     
     formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
     
-    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.string.alphanumeric(5))
     
     cy.getByTestId(SUBMIT_ELEMENT).click()
 
@@ -75,11 +75,11 @@ describe('Login', function () {
   })
 
   it('Should save account on local storage when credentials succeed ', function () {
-    mockResponse('POST', /login/, 200, 'fx:account')
+    mockResponse('POST', /login/, 200, 'account')
     
     formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
 
-    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.string.alphanumeric(5))
     
     cy.getByTestId(SUBMIT_ELEMENT).click()
 
@@ -92,13 +92,13 @@ describe('Login', function () {
   })
 
   it('Should not allowed multiple submits', function () {
-    mockResponse('POST', /login/, 200, 'fx:account')
+    mockResponse('POST', /login/, 200, 'account')
       .as('request')
     /* give a name to count requests */
     
     formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.internet.email())
     
-    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(5))
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.string.alphanumeric(5))
     
     /* simulate double click */
     cy.getByTestId(SUBMIT_ELEMENT).dblclick()
@@ -111,11 +111,11 @@ describe('Login', function () {
   })
 
   it('Should not call external service when form is invalid', function () {
-    mockResponse('POST', /login/, 200, 'fx:account')
+    mockResponse('POST', /login/, 200, 'account')
       .as('request')
     /* give a name to count requests */
     
-    formHelp.submitFormByEnter(EMAIL_ELEMENT, faker.random.alphaNumeric(5))
+    formHelp.submitFormByEnter(EMAIL_ELEMENT, faker.string.alphanumeric(5))
     
     /* verify if just call one time */
     cy.get('@request.all').should('have.length', 0)

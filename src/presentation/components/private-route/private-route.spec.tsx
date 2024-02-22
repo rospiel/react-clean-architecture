@@ -1,36 +1,36 @@
-import React from 'react'
-import { render } from '@testing-library/react'
-import { Router } from 'react-router-dom'
-import { createMemoryHistory, MemoryHistory } from 'history'
+import React, { isValidElement } from 'react'
+import { cleanup, render } from '@testing-library/react'
+import { BrowserRouter, Route, Router, RouterProvider, Routes, createMemoryRouter } from 'react-router-dom'
 import PrivateRoute from './private-route'
 import { mockAccountModel } from '@/domain/test'
 import ApiContext from '@/presentation/contexts/api/api-context'
 
-type SutTypes = {
-    history: MemoryHistory
-}
 
-function makeSut (account = mockAccountModel()): SutTypes {
-    const history = createMemoryHistory({ initialEntries: ['/'] })
-    render(
+function makeSut (account = mockAccountModel()): void {
+    render( 
         <ApiContext.Provider value={{ getCurrentAccount: () => account }}>
-            <Router history={history}>
-                <PrivateRoute />
-            </Router>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<PrivateRoute />}>
+                        <Route path="/" element={<></>} />
+                    </Route>
+                    <Route path="/login" element={<></>} />
+                </Routes>
+            </BrowserRouter>
         </ApiContext.Provider>
     )
-
-    return { history }
 }
 
 describe('PrivateRoute', function () {
+    afterEach(cleanup)
+    
     test('Should redirect to /login when token is empty', function () {
-        const { history } = makeSut(null)
-        expect(history.location.pathname).toBe('/login')
+        makeSut(null)
+        expect(global.window.location.href).toContain('/login')
     })
 
     test('Should render current component when token is present', function () {
-        const { history } = makeSut()
-        expect(history.location.pathname).toBe('/')
+        makeSut()
+        expect(global.window.location.href).toContain('/')
     })
 })

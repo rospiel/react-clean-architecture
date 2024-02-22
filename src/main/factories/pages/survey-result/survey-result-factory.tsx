@@ -4,8 +4,7 @@ import makeRemoteLoadSurveyResult from "../../usecases/load-survey-result/remote
 import React from 'react'
 
 export default function makeSurveyResult (): JSX.Element {
-    const { id } = useParams<{id: string}>()
     return (
-        <SurveyResult loadSurveyResult={makeRemoteLoadSurveyResult(id)} />
+        <SurveyResult loadSurveyResult={makeRemoteLoadSurveyResult()} />
     )
 }

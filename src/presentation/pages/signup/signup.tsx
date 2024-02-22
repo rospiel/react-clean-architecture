@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import Styles from './signup-styles.scss'
 
 import { LoginHeader, Footer, Input, FormStatus } from '@/presentation/components'
 import Context from '@/presentation/contexts/form/form-context'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Validation } from '@/presentation/protocols/validation'
 import { AddAccount } from '@/domain/usecases'
 import apiContext from '@/presentation/contexts/api/api-context'
@@ -43,8 +43,9 @@ export default function SignUp (props: SignUpProps): JSX.Element {
   }
 
   const { setCurrentAccount } = useContext(apiContext)
-  const history = useHistory()
+  const history = useNavigate()
   const [state, setState] = useState<StateProps>(initialStateProps())
+  const buttonElement = useRef(null);
 
   useEffect(() => {
     const formData = { name: state.name, email: state.email, password: state.password, passwordConfirmation: state.passwordConfirmation }
@@ -62,8 +63,9 @@ export default function SignUp (props: SignUpProps): JSX.Element {
     return !!state.emailError || !!state.passwordError || !!state.nameError || !!state.passwordConfirmationError
   }
 
-  async function handleSubmit (event: React.FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleSubmit (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {
     event.preventDefault()
+    buttonElement.current.disabled = true
 
     if (state.isLoading || hasError()) {
       return
@@ -83,7 +85,7 @@ export default function SignUp (props: SignUpProps): JSX.Element {
       })
 
       setCurrentAccount(account)
-      history.replace('/')
+      history('/', { replace: true })
     } catch (error) {
       setState(prevState => ({
         ...prevState,
@@ -91,13 +93,15 @@ export default function SignUp (props: SignUpProps): JSX.Element {
         message: error.message
       }))
     }
+
+    buttonElement.current.disabled = true
   }
 
   return (
-    <div className={Styles.signup}>
+    <div data-testid="signup-page" className={Styles.signup}>
       <LoginHeader />
       <Context.Provider value={ { state, setState } }>
-        <form data-testid="form" onSubmit={handleSubmit} className={Styles.form}>
+        <form data-testid="form" className={Styles.form}>
           <h2>Criar Conta</h2>
           <Input type="text" name="name" placeholder='Digite seu nome' />
 
@@ -107,7 +111,7 @@ export default function SignUp (props: SignUpProps): JSX.Element {
 
           <Input type="password" name="passwordConfirmation" placeholder='Repita sua senha' />
 
-          <button type="submit" disabled={hasError()} data-testid="submit" className={Styles.submit}>Cadastrar</button>
+          <button ref={buttonElement} onClick={handleSubmit} type="submit" disabled={hasError()} data-testid="submit" className={Styles.submit}>Cadastrar</button>
           <Link replace data-testid="signup" to="/login" className={Styles.link}>Voltar para login</Link>
           <FormStatus />
         </form>

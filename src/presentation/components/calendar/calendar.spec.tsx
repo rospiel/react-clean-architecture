@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Calendar, IconType } from '@/presentation/components'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 
 function makeSut (date: Date): void {
     render(

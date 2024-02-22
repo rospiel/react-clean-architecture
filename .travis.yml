@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 14
+  - 19
 addons:
   packages:
     - libgconf-2-4
@@ -9,7 +9,7 @@ cache:
   directories:
     - ~/.cache    
 before_install:
-  - npm install -g npm@7.24.2
+  - npm install -g npm@9.6.3
 script:
   - npm run test:ci
   - npm run test:cypress:ci

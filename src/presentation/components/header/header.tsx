@@ -13,6 +13,11 @@ export default function Header (): JSX.Element {
         event.preventDefault()
         logout()
     }
+
+    if (!(getCurrentAccount()?.accessToken)) {
+        logout()
+        return;
+    }
     
     return (
         <header className={Styles.surveyContainer__header}>

@@ -1,5 +1,5 @@
 import { HttpGetClientSpy } from '@/data/test'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { LoadSurveyResultModel, SurveyModel } from '@/domain/models'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { AccessDeniedError, UnexpectedError } from '@/domain/errors'
@@ -21,15 +21,16 @@ function makeSut (url: string = faker.internet.url()): SutTypes {
 
 describe('RemoteLoadSurveyResult', function () {
     test('Should call HttpGetClient with correct address', async function () {
-        const url = faker.internet.url()
+        const id = faker.string.alphanumeric()
+        const url = faker.internet.url().concat('/{id}/')
         const body = mockSurveyResultModel()
         const sut = makeSut(url)
         sut.httpGetClientSpy.response = {
             statusCode: HttpStatusCode.ok,
             body
         }
-        await sut.remoteLoadSurveyResult.load()
-        expect(sut.httpGetClientSpy.url).toBe(url)
+        await sut.remoteLoadSurveyResult.load(id)
+        expect(sut.httpGetClientSpy.url).toBe(url.replace('{id}', id))
     })
 
     test('Should throw AccessDeniedError when returns http code 403', async function () {
@@ -38,7 +39,7 @@ describe('RemoteLoadSurveyResult', function () {
         sut.httpGetClientSpy.response = {
             statusCode: HttpStatusCode.forbidden
         }
-        const promise = sut.remoteLoadSurveyResult.load()
+        const promise = sut.remoteLoadSurveyResult.load(faker.string.alphanumeric())
         await expect(promise).rejects.toThrow(new AccessDeniedError())
     })
 
@@ -48,7 +49,7 @@ describe('RemoteLoadSurveyResult', function () {
         sut.httpGetClientSpy.response = {
             statusCode: HttpStatusCode.notFound
         }
-        const promise = sut.remoteLoadSurveyResult.load()
+        const promise = sut.remoteLoadSurveyResult.load(faker.string.alphanumeric())
         await expect(promise).rejects.toThrow(new UnexpectedError())
     })
 
@@ -58,7 +59,7 @@ describe('RemoteLoadSurveyResult', function () {
         sut.httpGetClientSpy.response = {
             statusCode: HttpStatusCode.serverError
         }
-        const promise = sut.remoteLoadSurveyResult.load()
+        const promise = sut.remoteLoadSurveyResult.load(faker.string.alphanumeric())
         await expect(promise).rejects.toThrow(new UnexpectedError())
     })
 
@@ -70,7 +71,7 @@ describe('RemoteLoadSurveyResult', function () {
             statusCode: HttpStatusCode.ok,
             body
         }
-        const surveyModels = await sut.remoteLoadSurveyResult.load()
+        const surveyModels = await sut.remoteLoadSurveyResult.load(faker.string.alphanumeric())
         expect(surveyModels).toEqual(body)
     })
 
@@ -80,7 +81,7 @@ describe('RemoteLoadSurveyResult', function () {
         sut.httpGetClientSpy.response = {
             statusCode: HttpStatusCode.noContent
         }
-        const surveyModels = await sut.remoteLoadSurveyResult.load()
+        const surveyModels = await sut.remoteLoadSurveyResult.load(faker.string.alphanumeric())
         expect(surveyModels).toEqual({} as LoadSurveyResultModel)
     })
 })

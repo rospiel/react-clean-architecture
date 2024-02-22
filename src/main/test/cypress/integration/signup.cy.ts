@@ -1,4 +1,4 @@
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import react from 'react'
 import * as formHelp from '../utils/form-helpers'
 import * as helper from '../utils/helpers'
@@ -20,12 +20,12 @@ function buildCompletedValidForm (): void {
 
   formHelp.testInputStatusSuccess(EMAIL_STATUS_ELEMENT)
 
-  const password: string = faker.random.alphaNumeric(6)
+  const password: string = faker.string.alphanumeric(6)
   formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, password)
 
   formHelp.testInputStatusSuccess(PASSWORD_STATUS_ELEMENT)
   
-  formHelp.focusAndSetValueInput(NAME_ELEMENT, faker.name.findName())
+  formHelp.focusAndSetValueInput(NAME_ELEMENT, faker.person.fullName())
 
   formHelp.testInputStatusSuccess(NAME_STATUS_ELEMENT)
 
@@ -69,19 +69,19 @@ describe('SignUp', function () {
   })
 
   it('Should show error when form is invalid', function () {
-    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.random.alphaNumeric(1))
+    formHelp.focusAndSetValueInput(EMAIL_ELEMENT, faker.string.alphanumeric(1))
 
     formHelp.testInputStatusFailure(EMAIL_STATUS_ELEMENT)
 
-    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.random.alphaNumeric(1))
+    formHelp.focusAndSetValueInput(PASSWORD_ELEMENT, faker.string.alphanumeric(1))
 
     formHelp.testInputStatusFailure(PASSWORD_STATUS_ELEMENT) 
     
-    formHelp.focusAndSetValueInput(NAME_ELEMENT, faker.random.alphaNumeric(1))
+    formHelp.focusAndSetValueInput(NAME_ELEMENT, faker.string.alphanumeric(1))
 
     formHelp.testInputStatusFailure(NAME_STATUS_ELEMENT) 
 
-    formHelp.focusAndSetValueInput(PASSWORD_CONFIRMATION_ELEMENT, faker.random.alphaNumeric(2))
+    formHelp.focusAndSetValueInput(PASSWORD_CONFIRMATION_ELEMENT, faker.string.alphanumeric(2))
 
     formHelp.testInputStatusFailure(PASSWORD_CONFIRMATION_STATUS_ELEMENT) 
   })
@@ -97,7 +97,7 @@ describe('SignUp', function () {
   })
 
   it('Should throw EmailInUseError when email already in use', function () {
-    mockResponse('POST', /signup/, 403, { error: faker.random.words() })
+    mockResponse('POST', /signup/, 403, 'error')
     
     buildCompletedValidForm()
     
@@ -109,7 +109,7 @@ describe('SignUp', function () {
   })
 
   it('Should save account on local storage when credentials succeed ', function () {
-    mockResponse('POST', /signup/, 200, 'fx:account')
+    mockResponse('POST', /signup/, 200, 'account')
     
     buildCompletedValidForm()
     
@@ -124,7 +124,7 @@ describe('SignUp', function () {
   })
 
   it('Should not allowed multiple submits', function () {
-    mockResponse('POST', /signup/, 200, 'fx:account')
+    mockResponse('POST', /signup/, 200, 'account')
       .as('request')
     /* give a name to count requests */
     
@@ -140,7 +140,7 @@ describe('SignUp', function () {
   })
 
   it('Should not call external service when form is invalid', function () {
-    mockResponse('POST', /signup/, 200, { account: faker.random.uuid() })
+    mockResponse('POST', /signup/, 200, 'account')
       .as('request')
     /* give a name to count requests */
     
