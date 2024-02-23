@@ -10,7 +10,7 @@ cache:
   directories:
     - ~/.cache    
 before_install:
-  - npm install -g npm@10.2.4 --legacy-peer-deps
+  - npm install -g npm@10.2.4
 script:
   - npm run test:ci
   - npm run test:cypress:ci

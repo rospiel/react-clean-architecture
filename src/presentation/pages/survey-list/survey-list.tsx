@@ -7,6 +7,8 @@ import { SurveyModel } from '@/domain/models'
 import useErrorHandler from '@/presentation/hooks/use-error-handler'
 import Error from '@/presentation/components/error/error'
 import { Link } from 'react-router-dom'
+import { useRecoilState } from 'recoil'
+import { surveyListState } from './atoms/atoms'
 
 
 type SurveyListProps = {
@@ -15,11 +17,7 @@ type SurveyListProps = {
 
 export default function SurveyList (props: SurveyListProps): JSX.Element {
     const handleError = useErrorHandler({ callback })
-    const [state, setState] = useState({
-        surveys: [] as SurveyModel[], 
-        error: '', 
-        reload: false
-    })
+    const [state, setState] = useRecoilState(surveyListState)
     
     useEffect(() => {
         props.loadSurveyList.all()
