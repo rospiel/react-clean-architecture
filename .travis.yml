@@ -1,7 +1,7 @@
 dist: focal
 language: node_js
 node_js:
-  - 19
+  - 20
 addons:
   packages:
     - libgconf-2-4
@@ -10,7 +10,7 @@ cache:
   directories:
     - ~/.cache    
 before_install:
-  - npm install -g npm@9.6.3 --legacy-peer-deps
+  - npm install -g npm@10.2.4 --legacy-peer-deps
 script:
   - npm run test:ci
   - npm run test:cypress:ci
