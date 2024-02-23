@@ -1,7 +1,7 @@
 import { AccessDeniedError } from '@/domain/errors'
-import { useContext } from 'react'
-import apiContext from '../contexts/api/api-context'
 import useLogout from './use-logout'
+import { useRecoilValue } from 'recoil'
+import { currentAccountState } from '../components/atoms/atoms'
 
 type UseErrorHandlerProps = {
     callback: (error: Error) => void
@@ -12,7 +12,7 @@ type execute = (error: Error) => void
 
 export default function useErrorHandler ({ callback }: UseErrorHandlerProps): execute {
   const logout = useLogout()
-  const { setCurrentAccount } = useContext(apiContext)
+  const { setCurrentAccount } = useRecoilValue(currentAccountState)
   return function (error: Error): void {
     if (error instanceof AccessDeniedError) {
         logout()

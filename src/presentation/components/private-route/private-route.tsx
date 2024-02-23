@@ -1,9 +1,10 @@
-import apiContext from '@/presentation/contexts/api/api-context'
 import React, { useContext } from 'react'
 import { RouteProps, Route, Navigate, Outlet } from 'react-router-dom'
+import { useRecoilValue } from 'recoil'
+import { currentAccountState } from '../atoms/atoms'
 
 function isTokenEmpty (): boolean {
-    const { getCurrentAccount } = useContext(apiContext)
+    const { getCurrentAccount } = useRecoilValue(currentAccountState)
     return !(getCurrentAccount()?.accessToken)
 }
 

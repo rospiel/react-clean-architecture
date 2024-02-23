@@ -1,13 +1,14 @@
 import React, { useContext } from 'react'
 import Styles from './header-styles.scss'
 import { Logo } from '@/presentation/components'
-import apiContext from '@/presentation/contexts/api/api-context'
 import useLogout from '@/presentation/hooks/use-logout'
+import { useRecoilValue } from 'recoil'
+import { currentAccountState } from '../atoms/atoms'
 
 
 export default function Header (): JSX.Element {
     const logout = useLogout()
-    const { getCurrentAccount } = useContext(apiContext)
+    const { getCurrentAccount } = useRecoilValue(currentAccountState)
 
     function handleLogout (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>): void {
         event.preventDefault()

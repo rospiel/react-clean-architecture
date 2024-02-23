@@ -5,10 +5,23 @@ import makeSignUp from '@/main/factories/pages/signup/signup-factory'
 import makeSurveyList from '@/main/factories/pages/survey-list/survey-list-factory'
 import makeSurveyResult from '../factories/pages/survey-result/survey-result-factory'
 import PrivateRoute from '@/presentation/components/private-route/private-route'
-import ApiContext from '@/presentation/contexts/api/api-context'
 import setCurrentAccountAdapter, { getCurrentAccountAdapter } from '../adapters/current-account-adapter'
+import { RecoilRoot } from 'recoil'
+import { AccountModel } from '@/domain/models'
+import { currentAccountState } from '@/presentation/components/atoms/atoms'
+
+
+export type RouterState = {
+  setCurrentAccount: (account: AccountModel) => void
+  getCurrentAccount: () => AccountModel
+} 
 
 export default function Router (): JSX.Element {
+  const state: RouterState = {
+    setCurrentAccount: setCurrentAccountAdapter, 
+    getCurrentAccount: getCurrentAccountAdapter
+  }
+
   const PLACE = `${process.env.PLACE}`
 
   function getBaseName (): string {
@@ -16,11 +29,7 @@ export default function Router (): JSX.Element {
   }
 
   return (
-    <ApiContext.Provider 
-      value={{
-        setCurrentAccount: setCurrentAccountAdapter,
-        getCurrentAccount: getCurrentAccountAdapter
-      }}>
+    <RecoilRoot initializeState={({ set }) => set(currentAccountState, state)}>
       <BrowserRouter basename={getBaseName()}>
         <Routes>
           <Route path="/login" element={makeLogin()} />
@@ -33,6 +42,6 @@ export default function Router (): JSX.Element {
           </Route>
         </Routes>
       </BrowserRouter>
-    </ApiContext.Provider>
+    </RecoilRoot>
   )
 }

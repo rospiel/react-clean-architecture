@@ -3,12 +3,15 @@ import { cleanup, render } from '@testing-library/react'
 import { BrowserRouter, Route, Router, RouterProvider, Routes, createMemoryRouter } from 'react-router-dom'
 import PrivateRoute from './private-route'
 import { mockAccountModel } from '@/domain/test'
-import ApiContext from '@/presentation/contexts/api/api-context'
+import { RecoilRoot } from 'recoil'
+import { currentAccountState } from '../atoms/atoms'
 
 
 function makeSut (account = mockAccountModel()): void {
+    const mockedState = { setCurrentAccount: jest.fn(), getCurrentAccount: () => account }
+
     render( 
-        <ApiContext.Provider value={{ getCurrentAccount: () => account }}>
+        <RecoilRoot initializeState={({ set }) => set(currentAccountState, mockedState)}>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<PrivateRoute />}>
@@ -17,7 +20,7 @@ function makeSut (account = mockAccountModel()): void {
                     <Route path="/login" element={<></>} />
                 </Routes>
             </BrowserRouter>
-        </ApiContext.Provider>
+        </RecoilRoot>
     )
 }
 

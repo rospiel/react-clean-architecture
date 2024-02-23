@@ -6,7 +6,8 @@ import Context from '@/presentation/contexts/form/form-context'
 import { Link, useNavigate } from 'react-router-dom'
 import { Validation } from '@/presentation/protocols/validation'
 import { AddAccount } from '@/domain/usecases'
-import apiContext from '@/presentation/contexts/api/api-context'
+import { useRecoilValue } from 'recoil'
+import { currentAccountState } from '@/presentation/components/atoms/atoms'
 
 type StateProps = {
   name: string
@@ -42,7 +43,7 @@ export default function SignUp (props: SignUpProps): JSX.Element {
     }
   }
 
-  const { setCurrentAccount } = useContext(apiContext)
+  const { setCurrentAccount } = useRecoilValue(currentAccountState)
   const history = useNavigate()
   const [state, setState] = useState<StateProps>(initialStateProps())
   const buttonElement = useRef(null);

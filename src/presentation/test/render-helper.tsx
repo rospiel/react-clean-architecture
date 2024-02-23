@@ -3,7 +3,8 @@ import { mockAccountModel } from '@/domain/test'
 import { render } from '@testing-library/react'
 import React from 'react'
 import { Router } from 'react-router-dom'
-import ApiContext from '../contexts/api/api-context'
+import { RecoilRoot } from 'recoil'
+import { currentAccountState } from '../components/atoms/atoms'
 
 type RenderHelperProps = {
     component: JSX.Element
@@ -17,14 +18,14 @@ type RenderHelperResult = {
 
 export default function renderHelper ({ component, history, account = mockAccountModel() }: RenderHelperProps): RenderHelperResult {
     const setCurrentAccountMock = jest.fn()
+    const mockedState = { setCurrentAccount: setCurrentAccountMock, getCurrentAccount: () => account }
     
     render(
-        <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock, 
-            getCurrentAccount: () => account }}>
+        <RecoilRoot initializeState={({ set }) => set(currentAccountState, mockedState)}>
             <Router navigator={history} location={history.location} >
                 {component}
             </Router>
-        </ApiContext.Provider>
+        </RecoilRoot>
     )
 
     return {
