@@ -9,7 +9,6 @@ function isTokenEmpty (): boolean {
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
     return isTokenEmpty() ? <Navigate to="/login" /> : <Outlet /> 
-        
 }
 
 export default PrivateRoute

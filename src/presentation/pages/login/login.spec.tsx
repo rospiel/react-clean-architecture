@@ -1,33 +1,33 @@
 import React from 'react'
-import { render, fireEvent, waitFor, screen } from '@testing-library/react'
+import { fireEvent, waitFor, screen } from '@testing-library/react'
 import { Login } from '@/presentation/pages'
 import { AuthenticationSpy, ValidationStub, Helper } from '@/presentation/test'
 import { faker } from '@faker-js/faker'
 import { InvalidCredentialsError } from '@/domain/errors'
-import { BrowserRouter } from 'react-router-dom'
-import ApiContext from '@/presentation/contexts/api/api-context'
 import { AccountModel } from '@/domain/models'
+import renderHelper from '@/presentation/test/render-helper'
 
 type screenTypes = {
   authenticationSpy: AuthenticationSpy
   setCurrentAccountMock: (account: AccountModel) => void
+  history: any
 }
 
 function makeSut (errorMessage?: string): screenTypes {
   const validationStub = new ValidationStub()
   const authenticationSpy = new AuthenticationSpy()
-  const setCurrentAccountMock = jest.fn()
   validationStub.errorMessage = errorMessage
+  const { createBrowserHistory } = require("history");
+  const history = createBrowserHistory({ initialEntries: ['/login'], initialIndex: 0 })
   
-  render(
-    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
-      <Login validation={validationStub} authentication={authenticationSpy} />
-    </ApiContext.Provider>, 
-    {wrapper: BrowserRouter}
-  )
+  const { setCurrentAccountMock } = renderHelper({
+    component: <Login validation={validationStub} authentication={authenticationSpy} />, 
+    history
+  })
   return {
     authenticationSpy, 
-    setCurrentAccountMock
+    setCurrentAccountMock, 
+    history
   }
 }
 
@@ -158,9 +158,9 @@ describe('Login component', () => {
   })
 
   test('Should redirect to signup page', () => {
-    makeSut()
+    const { history } = makeSut()
     const register = screen.getByTestId('signup')
     fireEvent.click(register)
-    expect(global.window.location.href).toContain('/signup')
+    expect(history.location.pathname).toBe('/signup')
   })
 })

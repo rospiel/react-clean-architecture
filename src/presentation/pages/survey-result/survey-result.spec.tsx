@@ -1,13 +1,11 @@
-import { mockAccountModel } from "@/domain/test"
-import ApiContext from "@/presentation/contexts/api/api-context"
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { fireEvent, screen, waitFor } from "@testing-library/react"
 import React from 'react'
 import SurveyResult from "./survey-result"
 import { LoadSurveyResultSpy, mockSurveyResultModel } from "@/domain/test/mock-survey-result"
 import { faker } from '@faker-js/faker'
 import { AccessDeniedError, UnexpectedError } from "@/domain/errors"
 import { AccountModel } from "@/domain/models"
-import { Router } from "react-router-dom"
+import renderHelper from "@/presentation/test/render-helper"
 
 type SutTypes = {
     loadSurveyResultSpy: LoadSurveyResultSpy
@@ -18,16 +16,11 @@ type SutTypes = {
 function makeSut (loadSurveyResultSpy = new LoadSurveyResultSpy()): SutTypes {
     const { createBrowserHistory } = require("history");
     const history = createBrowserHistory({ initialEntries: ['/', '/surveys/id'], initialIndex: 0 })
-    const setCurrentAccountMock = jest.fn()
     
-    render(
-        <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock, 
-            getCurrentAccount: () => mockAccountModel()  }}>
-            <Router navigator={history} location={history.location} >
-                <SurveyResult loadSurveyResult={loadSurveyResultSpy} />
-            </Router>
-        </ApiContext.Provider>
-    )
+    const { setCurrentAccountMock } = renderHelper({
+        component: <SurveyResult loadSurveyResult={loadSurveyResultSpy} />,
+        history
+    })
 
     return {
         loadSurveyResultSpy,
@@ -102,7 +95,6 @@ describe('SurveyResult Component', function () {
         await waitFor(() => screen.getByTestId('survey-result'))
         expect(setCurrentAccountMock).toHaveBeenCalledWith(undefined)
         expect(history.location.pathname).toBe('/login')
-        history.lo
     })
 
     test('Should call again when requested reload', async function () {

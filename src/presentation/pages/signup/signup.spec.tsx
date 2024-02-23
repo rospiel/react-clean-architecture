@@ -4,13 +4,13 @@ import SignUp from './signup'
 import { AddAccountSpy, Helper, ValidationStub } from '@/presentation/test'
 import { faker } from '@faker-js/faker'
 import { EmailInUseError } from '@/domain/errors'
-import { BrowserRouter } from 'react-router-dom'
 import { AccountModel } from '@/domain/models'
-import ApiContext from '@/presentation/contexts/api/api-context'
+import renderHelper from '@/presentation/test/render-helper'
 
 type SutTypes = {
   addAccountSpy: AddAccountSpy
-  setCurrentAccountMock: (account: AccountModel) => void
+  setCurrentAccountMock: (account: AccountModel) => void, 
+  history: any
 }
 
 type SutParams = {
@@ -21,16 +21,17 @@ function makeSut (props?: SutParams): SutTypes {
   const validationStub = new ValidationStub()
   validationStub.errorMessage = props?.error
   const addAccountSpy = new AddAccountSpy()
-  const setCurrentAccountMock = jest.fn()
-  render(
-    <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock }}>
-      <SignUp validation={validationStub} addAccount={addAccountSpy} />
-    </ApiContext.Provider>,
-    {wrapper: BrowserRouter}
-  )
+  const { createBrowserHistory } = require("history");
+  const history = createBrowserHistory({ initialEntries: ['/signup'], initialIndex: 0 })
+
+  const { setCurrentAccountMock } = renderHelper({
+    component: <SignUp validation={validationStub} addAccount={addAccountSpy} />, 
+    history
+  })
   return {
     addAccountSpy,
-    setCurrentAccountMock
+    setCurrentAccountMock, 
+    history
   }
 }
 
@@ -172,16 +173,16 @@ describe('SignUp Component', () => {
   })
 
   test('Should call SaveAccessToken on success', async () => {
-    const { addAccountSpy, setCurrentAccountMock } = makeSut()
+    const { addAccountSpy, setCurrentAccountMock, history } = makeSut()
     await simulateSubmit()
     expect(setCurrentAccountMock).toHaveBeenCalledWith(addAccountSpy.account)
-    expect(global.window.location.href).toContain('/')
+    expect(history.location.pathname).toBe('/')
   })
 
   test('Should redirect to login page', () => {
-    makeSut()
+    const { history } = makeSut()
     const register = screen.getByTestId('signup')
     fireEvent.click(register)
-    expect(global.window.location.href).toContain('/login')
+    expect(history.location.pathname).toBe('/login')
   })
 })

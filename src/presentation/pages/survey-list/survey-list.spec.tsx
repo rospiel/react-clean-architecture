@@ -1,32 +1,31 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import React from 'react'
 import SurveyList from './survey-list'
 import { LoadSurveyListSpy, mockAccountModel, mockSurveyListModel, mockSurveyModel } from '@/domain/test'
 import { IconType } from '@/presentation/components'
 import { faker } from '@faker-js/faker'
 import { UnexpectedError, AccessDeniedError } from '@/domain/errors'
-import ApiContext from '@/presentation/contexts/api/api-context'
-import { BrowserRouter, Router } from 'react-router-dom'
 import { AccountModel } from '@/domain/models'
+import renderHelper from '@/presentation/test/render-helper'
 
 type SutTypes = {
     loadSurveyListSpy: LoadSurveyListSpy
-    setCurrentAccountMock: (account: AccountModel) => void
+    setCurrentAccountMock: (account: AccountModel) => void 
+    history
 }
 
 function makeSut (loadSurveyListSpy: LoadSurveyListSpy = new LoadSurveyListSpy()): SutTypes {
-    const setCurrentAccountMock = jest.fn()
+    const { createBrowserHistory } = require("history");
+    const history = createBrowserHistory({ initialEntries: ['/'], initialIndex: 0 })
     
-    render(
-        <ApiContext.Provider value={{ setCurrentAccount: setCurrentAccountMock, 
-                                      getCurrentAccount: () => mockAccountModel()  }}>
-            <SurveyList loadSurveyList={loadSurveyListSpy} />
-        </ApiContext.Provider>, 
-        {wrapper: BrowserRouter}
-    )
+    const { setCurrentAccountMock } = renderHelper({
+        component: <SurveyList loadSurveyList={loadSurveyListSpy} />, 
+        history
+    })
     return {
         setCurrentAccountMock,
-        loadSurveyListSpy
+        loadSurveyListSpy, 
+        history
     }
 }
 
@@ -90,10 +89,10 @@ describe('SurveyList component', function () {
         const loadSurveyListSpy = new LoadSurveyListSpy()
         const error = new AccessDeniedError()
         jest.spyOn(loadSurveyListSpy, 'all').mockRejectedValueOnce(error)
-        const { setCurrentAccountMock } = makeSut(loadSurveyListSpy)
+        const { setCurrentAccountMock, history } = makeSut(loadSurveyListSpy)
         await waitFor(() => screen.getByRole('heading'))
         expect(setCurrentAccountMock).toHaveBeenCalledWith(undefined)
-        expect(global.window.location.href).toContain('/login')
+        expect(history.location.pathname).toBe('/login')
     })
 
     test('Should call again when requested reload', async function () {
@@ -111,9 +110,9 @@ describe('SurveyList component', function () {
         const survey = mockSurveyModel()
         let loadSurveyListSpy = new LoadSurveyListSpy()
         loadSurveyListSpy.surveys = [survey]
-        makeSut(loadSurveyListSpy)
+        const { history } = makeSut(loadSurveyListSpy)
         await waitFor(() => screen.getByRole('heading'))
         fireEvent.click(screen.getByTestId('link'))
-        expect(global.window.location.href).toContain('/surveys/')
+        expect(history.location.pathname).toBe('/surveys/'.concat(survey.id))
     })
 })

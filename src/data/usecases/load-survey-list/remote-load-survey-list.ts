@@ -21,8 +21,4 @@ export class RemoteLoadSurveyList implements LoadSurveyList {
             default: throw new UnexpectedError()
         }
     }
-
-    private convertStringToDate (date: string): Date {
-        return new Date(date)
-    }
 }
