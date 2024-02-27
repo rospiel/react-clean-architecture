@@ -1,42 +1,30 @@
-import { HttpPostClient, HttpPostClientParams, HttpResponse, HttpStatusCode, HttpGetParams, HttpGetClient } from '@/data/protocols/http'
+import { HttpRequest, } from '@/data/protocols/http'
+import { HttpMethod, HttpStatusCode } from '@/domain/enums'
 import { faker } from '@faker-js/faker'
+import HttpClient, { HttpResponse } from '@/data/protocols/http/http-client'
 
-export const mockPostRequest = (): HttpPostClientParams => ({
+export const mockHttpRequest = (): HttpRequest => ({
   url: faker.internet.url(),
+  method: faker.helpers.enumValue(HttpMethod),
+  headers: faker.person.fullName(),
   body: faker.person.fullName()
 })
 
-export function mockGetRequest (): HttpGetParams {
-  return {
-    url: faker.internet.url(),
-    headers: faker.person.fullName()
-  }
-} 
-
-export class HttpPostClientSpy<R = any> implements HttpPostClient<R> {
+export class HttpClientSpy<R = any> implements HttpClient<R> {
   url?: string
   body?: any
+  method?: HttpMethod
+  headers?: any
   response: HttpResponse<R> = {
     statusCode: HttpStatusCode.ok
   }
 
-  async post (params: HttpPostClientParams): Promise<HttpResponse<R>> {
-    this.url = params.url
-    this.body = params.body
+  async request (data: HttpRequest): Promise<HttpResponse<R>> {
+    this.url = data.url
+    this.method = data.method
+    this.body = data.body
+    this.headers = data.headers
     return this.response
   }
 }
 
-export class HttpGetClientSpy<T = any> implements HttpGetClient<T> {
-  url: string
-  headers?: any
-  response: HttpResponse<T> = {
-    statusCode: HttpStatusCode.ok
-  }
-
-  async get (params: HttpGetParams): Promise<HttpResponse<T>> {
-    this.url = params.url
-    this.headers = params.headers
-    return this.response
-  }
-}

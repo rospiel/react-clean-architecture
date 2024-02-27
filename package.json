@@ -12,11 +12,12 @@
     "test:ci": "npm test -- --coverage",
     "dev:base": "webpack-dev-server --config webpack.dev.js",
     "dev": "npm run dev:base -- --open",
-    "build": "webpack --config webpack.prd.js",
+    "build": "webpack --config webpack.prd.js --devtool source-map",
     "check": "npm-check -u -s",
     "test:cypress": "cypress open",
     "test:cypress:run": "cypress run",
-    "test:cypress:ci": "start-server-and-test dev:base http-get://localhost:8080 test:cypress:run"
+    "test:cypress:ci": "start-server-and-test dev:base http-get://localhost:8080 test:cypress:run",
+    "analyze": "source-map-explorer 'public/*.js'"
   },
   "keywords": [],
   "author": "",
@@ -60,6 +61,7 @@
     "mini-css-extract-plugin": "2.8.0",
     "node-sass": "9.0.0",
     "sass-loader": "14.1.1",
+    "source-map-explorer": "2.5.3",
     "start-server-and-test": "2.0.3",
     "style-loader": "3.3.4",
     "ts-jest": "29.1.2",
