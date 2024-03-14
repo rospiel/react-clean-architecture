@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import react from 'react'
 import * as formHelp from '../utils/form-helpers'
-import * as herlper from '../utils/helpers'
+import * as helper from '../utils/helpers'
 import { mockResponse } from '../utils/http-mocks'
 
 const EMAIL_ELEMENT = 'email'
@@ -71,7 +71,7 @@ describe('Login', function () {
 
     formHelp.testContainerError('Credenciais inválidas')
     
-    herlper.testUrl('/login')
+    helper.testUrl('/login')
   })
 
   it('Should save account on local storage when credentials succeed ', function () {
@@ -86,9 +86,9 @@ describe('Login', function () {
     cy.getByTestId(ERROR_ELEMENT)
       .should('not.exist')
       
-    herlper.testUrl('/')
+    helper.testUrl('/')
 
-    herlper.checkItemLocalStorage('account')
+    helper.checkItemLocalStorage('account')
   })
 
   it('Should not allowed multiple submits', function () {

@@ -17,7 +17,9 @@
     "test:cypress": "cypress open",
     "test:cypress:run": "cypress run",
     "test:cypress:ci": "start-server-and-test dev:base http-get://localhost:8080 test:cypress:run",
-    "analyze": "source-map-explorer 'public/*.js'"
+    "analyze": "source-map-explorer 'public/*.js'",
+    "test-ct": "playwright test --project='webkit' -c playwright-ct.config.ts",
+    "test-ct:ci": "start-server-and-test dev:base http-get://localhost:8080 test-ct"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +27,7 @@
   "devDependencies": {
     "@cypress/webpack-preprocessor": "6.0.1",
     "@faker-js/faker": "8.4.1",
+    "@playwright/experimental-ct-react": "1.42.0",
     "@testing-library/jest-dom": "6.4.2",
     "@testing-library/react": "14.2.1",
     "@types/axios": "0.14.0",

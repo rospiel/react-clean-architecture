@@ -1,0 +1,23 @@
+export function buildAccount (): object {
+    return {
+        "accessToken": "accessToken",
+        "name": "name"
+    }
+}
+
+export function buildSurveyList (): object[] {
+    return [
+        {
+            "question": "Question 0",
+            "date": "1815-02-25T00:00:00",
+            "didAnswer": false,
+            "id": "1"
+        }, 
+        {
+            "question": "Question 1",
+            "date": "2126-11-15T00:00:00",
+            "didAnswer": true,
+            "id": "2"
+        }
+    ]
+}
